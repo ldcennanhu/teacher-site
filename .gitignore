@@ -1,3 +1,4 @@
 .auto-sync/*.log
 .auto-sync/*.tmp
 sync-debug.txt
+*.lnk
