@@ -1,12 +1,65 @@
 (function () {
   const INTERVAL = 7000;
 
+  function asArray(value) {
+    return Array.isArray(value) ? value : [];
+  }
+
+  function firstText() {
+    for (let index = 0; index < arguments.length; index += 1) {
+      const value = arguments[index];
+      if (typeof value === "string" && value.trim()) {
+        return value.trim();
+      }
+    }
+
+    return "";
+  }
+
+  function normalizeMaterial(item) {
+    return {
+      id: firstText(item.id),
+      topic: firstText(item.topic),
+      title: firstText(item.title),
+      summary: firstText(item.summary),
+      tags: asArray(item.tags).filter(Boolean),
+      points: asArray(item.points).filter(Boolean),
+      mainQuote: firstText(item.mainQuote, item.main_quote),
+      life: firstText(item.life),
+      quotes: asArray(item.quotes).filter(Boolean),
+      topics: asArray(item.topics).filter(Boolean),
+      expand: firstText(item.expand),
+      updatedAt: firstText(item.updatedAt, item.updated_at),
+      publishedAt: firstText(item.publishedAt, item.published_at)
+    };
+  }
+
   function materials() {
-    return window.GDTK_MATERIALS || [];
+    return asArray(window.GDTK_MATERIALS).map(normalizeMaterial);
   }
 
   function quoteList() {
     return materials().map((item) => item.mainQuote).filter(Boolean);
+  }
+
+  async function loadRemoteMaterials() {
+    if (!window.fetch) return;
+
+    try {
+      const response = await window.fetch("/api/materials", {
+        headers: { Accept: "application/json" },
+        cache: "no-store"
+      });
+
+      if (!response.ok) return;
+
+      const data = await response.json();
+      if (Array.isArray(data) && data.length) {
+        window.GDTK_MATERIALS = data.map(normalizeMaterial);
+      }
+    } catch (error) {
+      window.console.warn("素材卡片接口暂不可用，继续显示静态素材。", error);
+    }
   }
 
   function startCarousels() {
@@ -29,23 +82,39 @@
     });
   }
 
+  function escapeHtml(text) {
+    return String(text || "")
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;")
+      .replace(/"/g, "&quot;")
+      .replace(/'/g, "&#039;");
+  }
+
   function renderMaterialCards() {
     const grid = document.querySelector("[data-material-grid]");
     if (!grid) return;
-    grid.innerHTML = materials().map((item, index) => `
+
+    const rows = materials();
+    if (!rows.length) {
+      grid.innerHTML = '<p class="muted">暂无公开素材卡片，请稍后再来查看。</p>';
+      return;
+    }
+
+    grid.innerHTML = rows.map((item, index) => `
       <article class="material-card" role="button" tabindex="0" data-index="${index}">
-        <div class="material-meta">${item.topic}</div>
-        <h2>${item.title}</h2>
-        <p>${item.summary}</p>
-        <div class="material-tags">${item.tags.map((tag) => `<span>${tag}</span>`).join("")}</div>
-        <blockquote>${item.mainQuote}</blockquote>
-        <ul>${item.points.map((point) => `<li>${point}</li>`).join("")}</ul>
+        <div class="material-meta">${escapeHtml(item.topic)}</div>
+        <h2>${escapeHtml(item.title)}</h2>
+        <p>${escapeHtml(item.summary)}</p>
+        <div class="material-tags">${item.tags.map((tag) => `<span>${escapeHtml(tag)}</span>`).join("")}</div>
+        <blockquote>${escapeHtml(item.mainQuote)}</blockquote>
+        <ul>${item.points.map((point) => `<li>${escapeHtml(point)}</li>`).join("")}</ul>
       </article>
     `).join("");
   }
 
   function fillList(target, items) {
-    target.innerHTML = items.map((item) => `<li>${item}</li>`).join("");
+    target.innerHTML = asArray(items).map((item) => `<li>${escapeHtml(item)}</li>`).join("");
   }
 
   function initModal() {
@@ -96,14 +165,6 @@
     document.addEventListener("keydown", (event) => {
       if (event.key === "Escape" && modal.classList.contains("is-open")) closeDetail();
     });
-  }
-
-  function escapeHtml(text) {
-    return String(text || "")
-      .replace(/&/g, "&amp;")
-      .replace(/</g, "&lt;")
-      .replace(/>/g, "&gt;")
-      .replace(/"/g, "&quot;");
   }
 
   function downloadMaterialsDoc() {
@@ -160,9 +221,10 @@
     });
   }
 
-  document.addEventListener("DOMContentLoaded", () => {
-    startCarousels();
+  document.addEventListener("DOMContentLoaded", async () => {
+    await loadRemoteMaterials();
     renderMaterialCards();
+    startCarousels();
     initModal();
     initDownloads();
   });
