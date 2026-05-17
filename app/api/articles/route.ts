@@ -20,7 +20,7 @@ function normalizeArticle(article: ArticleRow) {
     summary: article.summary ?? "",
     tags: Array.isArray(article.tags) ? article.tags : [],
     date: article.published_at ?? article.updated_at ?? "",
-    url: `/articles/${article.section}/${article.slug}`
+    url: article.section && article.slug ? `/articles/${article.section}/${article.slug}` : "#"
   };
 }
 
