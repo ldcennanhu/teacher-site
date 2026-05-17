@@ -3,6 +3,7 @@ import { createClient } from "../../../lib/supabase/server";
 
 type ArticleRow = {
   title: string | null;
+  slug: string | null;
   section: string | null;
   category: string | null;
   summary: string | null;
@@ -19,7 +20,7 @@ function normalizeArticle(article: ArticleRow) {
     summary: article.summary ?? "",
     tags: Array.isArray(article.tags) ? article.tags : [],
     date: article.published_at ?? article.updated_at ?? "",
-    url: "#"
+    url: `/articles/${article.section}/${article.slug}`
   };
 }
 
@@ -34,7 +35,7 @@ export async function GET(request: NextRequest) {
   try {
     let query = supabase
       .from("articles")
-      .select("title,section,category,summary,tags,updated_at,published_at")
+     .select("title,slug,section,category,summary,tags,updated_at,published_at")
       .eq("status", "published")
       .eq("visibility", "public")
       .order("is_pinned", { ascending: false })
