@@ -16,10 +16,14 @@
     return "";
   }
 
+  function stripTopicOrder(text) {
+    return String(text || "").replace(/^\s*\d+\s*\/\s*/, "").trim();
+  }
+
   function normalizeMaterial(item) {
     return {
       id: firstText(item.id),
-      topic: firstText(item.topic),
+      topic: stripTopicOrder(firstText(item.topic)),
       title: firstText(item.title),
       summary: firstText(item.summary),
       tags: asArray(item.tags).filter(Boolean),
