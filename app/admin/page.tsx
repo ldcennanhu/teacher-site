@@ -27,6 +27,14 @@ export default async function AdminHomePage() {
           </article>
 
           <article className="admin-card">
+            <h2>素材卡片墙</h2>
+            <p>新建、编辑和删除当前登录用户自己的作文素材卡片。</p>
+            <Link className="admin-button" href="/admin/materials">
+              进入素材
+            </Link>
+          </article>
+
+          <article className="admin-card">
             <h2>备课文件</h2>
             <p>上传和管理 PPT、PDF、Word、学案、练习题等备课资料。</p>
             <Link className="admin-button" href="/admin/files">
