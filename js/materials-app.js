@@ -155,7 +155,10 @@
     function openDetail(index) {
       const detail = materials()[index];
       if (!detail) return;
-      topicEl.textContent = detail.topic;
+
+      const order = String(index + 1).padStart(2, "0");
+
+      topicEl.textContent = `${order} / ${detail.topic}`;
       titleEl.textContent = detail.title;
       lifeEl.textContent = detail.life;
       fillList(quotesEl, detail.quotes);
