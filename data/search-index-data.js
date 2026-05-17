@@ -1,0 +1,302 @@
+window.GDTK_SEARCH_INDEX = [
+  {
+    "title": "青年成长类人物素材",
+    "column": "作文专区",
+    "summary": "整理适合青春成长、热爱坚持、自我突破主题的人物素材，便于课堂摘抄和考前积累。",
+    "tags": [
+      "作文",
+      "青年成长",
+      "人物素材"
+    ],
+    "url": "zuowen.html#resource-cards"
+  },
+  {
+    "title": "家国情怀类万能金句",
+    "column": "作文专区",
+    "summary": "适合家国情怀、青年担当、时代责任类作文的金句积累。",
+    "tags": [
+      "作文",
+      "金句",
+      "家国情怀"
+    ],
+    "url": "zuowen.html#resource-cards"
+  },
+  {
+    "title": "关系型思辨作文结构模板",
+    "column": "作文专区",
+    "summary": "用于处理二元关系、价值权衡、现实思辨类议论文结构。",
+    "tags": [
+      "议论文",
+      "思辨作文",
+      "结构模板"
+    ],
+    "url": "zuowen.html#resource-cards"
+  },
+  {
+    "title": "高频实词“信”用法整理",
+    "column": "文言文研习",
+    "summary": "归纳文言实词“信”的常见义项、例句和迁移方法。",
+    "tags": [
+      "文言实词",
+      "文言文",
+      "信"
+    ],
+    "url": "wenyan.html#resource-cards"
+  },
+  {
+    "title": "“之”字六类用法",
+    "column": "文言文研习",
+    "summary": "整理代词、助词、动词等“之”字高频用法。",
+    "tags": [
+      "文言虚词",
+      "之",
+      "文言文"
+    ],
+    "url": "wenyan.html#resource-cards"
+  },
+  {
+    "title": "文言特殊句式总表",
+    "column": "文言文研习",
+    "summary": "判断句、被动句、省略句、倒装句等常考句式总览。",
+    "tags": [
+      "特殊句式",
+      "文言翻译",
+      "文言文"
+    ],
+    "url": "wenyan.html#resource-cards"
+  },
+  {
+    "title": "“月”意象归纳",
+    "column": "诗词曲赋",
+    "summary": "归纳诗歌中月亮意象的常见情感和答题表达。",
+    "tags": [
+      "诗歌意象",
+      "月",
+      "诗词"
+    ],
+    "url": "shici.html#resource-cards"
+  },
+  {
+    "title": "默写易错字整理",
+    "column": "诗词曲赋",
+    "summary": "整理高中古诗文默写中的高频易错字和易混句。",
+    "tags": [
+      "默写易错",
+      "古诗文",
+      "诗词"
+    ],
+    "url": "shici.html#resource-cards"
+  },
+  {
+    "title": "边塞诗常见情感",
+    "column": "诗词曲赋",
+    "summary": "梳理边塞诗中的报国、思乡、壮志、苍凉等情感类型。",
+    "tags": [
+      "边塞诗",
+      "诗词赏析",
+      "情感"
+    ],
+    "url": "shici.html#resource-cards"
+  },
+  {
+    "title": "小说环境描写作用题",
+    "column": "现代文阅读",
+    "summary": "整理小说阅读中环境描写作用题的答题角度。",
+    "tags": [
+      "小说阅读",
+      "环境描写",
+      "现代文阅读"
+    ],
+    "url": "yuedu.html#resource-cards"
+  },
+  {
+    "title": "论述类文本设误角度",
+    "column": "现代文阅读",
+    "summary": "概括论述类文本选择题常见设误方式与辨析方法。",
+    "tags": [
+      "论述类文本",
+      "现代文阅读",
+      "设误"
+    ],
+    "url": "yuedu.html#resource-cards"
+  },
+  {
+    "title": "散文标题作用题",
+    "column": "现代文阅读",
+    "summary": "从内容、结构、情感、主题等角度整理标题作用题。",
+    "tags": [
+      "散文",
+      "标题作用",
+      "现代文阅读"
+    ],
+    "url": "yuedu.html#resource-cards"
+  },
+  {
+    "title": "《红楼梦》人物关系",
+    "column": "名著导读",
+    "summary": "梳理《红楼梦》主要人物关系和高频考点。",
+    "tags": [
+      "名著人物",
+      "红楼梦",
+      "人物关系"
+    ],
+    "url": "mingzhu.html#resource-cards"
+  },
+  {
+    "title": "《乡土中国》核心概念",
+    "column": "名著导读",
+    "summary": "整理差序格局、礼治秩序、熟人社会等核心概念。",
+    "tags": [
+      "乡土中国",
+      "核心概念",
+      "名著导读"
+    ],
+    "url": "mingzhu.html#resource-cards"
+  },
+  {
+    "title": "《边城》人物形象",
+    "column": "名著导读",
+    "summary": "整理翠翠、爷爷、傩送等人物形象和主题理解。",
+    "tags": [
+      "边城",
+      "人物形象",
+      "名著人物"
+    ],
+    "url": "mingzhu.html#resource-cards"
+  },
+  {
+    "title": "必修上第一单元学案",
+    "column": "备课资源",
+    "summary": "适合课堂使用的单元学案模板和学习任务设计。",
+    "tags": [
+      "备课",
+      "学案",
+      "必修上"
+    ],
+    "url": "beike.html#resource-cards"
+  },
+  {
+    "title": "月考作文讲评课件",
+    "column": "备课资源",
+    "summary": "用于月考作文讲评的结构分析、升格示例和训练建议。",
+    "tags": [
+      "备课",
+      "作文讲评",
+      "课件"
+    ],
+    "url": "beike.html#resource-cards"
+  },
+  {
+    "title": "文言文翻译专题练习",
+    "column": "备课资源",
+    "summary": "针对文言翻译关键词、句式和语序调整的专题练习。",
+    "tags": [
+      "备课",
+      "文言翻译",
+      "练习"
+    ],
+    "url": "beike.html#resource-cards"
+  },
+  {
+    "title": "苏轼：在信息茧房外保持清醒",
+    "column": "素材卡片墙",
+    "summary": "适用于独立思考、信息茧房、人格修养和理性判断主题。",
+    "tags": [
+      "苏轼",
+      "作文",
+      "思辨哲理"
+    ],
+    "url": "pages/writing-cards-week20.html"
+  },
+  {
+    "title": "“月”意象归纳",
+    "column": "诗词曲赋",
+    "section": "shici",
+    "summary": "归纳诗歌中“月”意象的常见情感和答题表达。",
+    "tags": [
+      "诗歌意象",
+      "月",
+      "诗词赏析"
+    ],
+    "date": "2026-05-17",
+    "url": "articles/shici/yue-yixiang.html",
+    "generatedFromMarkdown": true,
+    "source": "content/shici/yue-yixiang.md"
+  },
+  {
+    "title": "《红楼梦》人物关系",
+    "column": "名著导读",
+    "section": "mingzhu",
+    "summary": "梳理《红楼梦》主要人物关系和高频考点。",
+    "tags": [
+      "名著人物",
+      "红楼梦",
+      "人物关系"
+    ],
+    "date": "2026-05-17",
+    "url": "articles/mingzhu/hongloumeng-renwu.html",
+    "generatedFromMarkdown": true,
+    "source": "content/mingzhu/hongloumeng-renwu.md"
+  },
+  {
+    "title": "必修上第一单元学案",
+    "column": "备课资源",
+    "section": "beike",
+    "summary": "适合课堂使用的单元学案模板和学习任务设计。",
+    "tags": [
+      "备课",
+      "学案",
+      "必修上"
+    ],
+    "date": "2026-05-17",
+    "url": "articles/beike/bixiu-shang-danyi.html",
+    "generatedFromMarkdown": true,
+    "source": "content/beike/bixiu-shang-danyi.md"
+  },
+  {
+    "title": "高频实词“信”用法整理",
+    "column": "文言文研习",
+    "section": "wenyan",
+    "summary": "归纳文言实词“信”的常见义项、例句和迁移方法。",
+    "tags": [
+      "文言实词",
+      "信",
+      "翻译"
+    ],
+    "date": "2026-05-17",
+    "url": "articles/wenyan/shi-ci-xin.html",
+    "generatedFromMarkdown": true,
+    "source": "content/wenyan/shi-ci-xin.md"
+  },
+  {
+    "title": "青年成长类作文素材",
+    "column": "作文专区",
+    "section": "zuowen",
+    "summary": "适用于成长、突破、时代青年等作文主题。",
+    "tags": [
+      "青年",
+      "成长",
+      "奋斗",
+      "作文"
+    ],
+    "date": "2026-05-17",
+    "url": "articles/zuowen/qingnian-chengzhang.html",
+    "generatedFromMarkdown": true,
+    "source": "content/zuowen/qingnian-chengzhang.md"
+  },
+  {
+    "title": "小说环境描写作用题",
+    "column": "现代文阅读",
+    "section": "yuedu",
+    "summary": "整理小说阅读中环境描写作用题的常见答题角度。",
+    "tags": [
+      "小说阅读",
+      "环境描写",
+      "作用题"
+    ],
+    "date": "2026-05-17",
+    "url": "articles/yuedu/xiaoshuo-huanjing.html",
+    "generatedFromMarkdown": true,
+    "source": "content/yuedu/xiaoshuo-huanjing.md"
+  }
+];

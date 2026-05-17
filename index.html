@@ -3,6 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="孤登塔客语文馆，高中语文教学资料网站，整理作文、文言文、诗词、现代文阅读、名著导读与备课资源。">
   <title>孤登塔客语文馆｜高中语文教学资源</title>
   <link rel="stylesheet" href="css/styles.css">
 </head>
@@ -19,6 +20,7 @@
         <a href="pages/writing-cards-week20.html">素材卡片墙</a>
         <a href="beike.html">备课资源</a>
         <a href="about.html">关于师者</a>
+        <a href="search.html">搜索资料</a><a href="favorites.html">我的收藏</a>
       </div>
     </nav>
   </header>
@@ -63,6 +65,20 @@
         <a class="column-card" href="about.html"><div><span class="card-index">08</span><h3>关于师者</h3><p>教师简介、教学理念、育人感悟与给学生的学习寄语。</p><div class="tag-list"><span>理念</span><span>寄语</span><span>师者</span></div></div><span class="enter">进入栏目</span></a>
       </div>
     </section>
+    <section class="section latest-updates">
+      <div class="section-heading">
+        <h2>最新更新</h2>
+        <p>自动读取 Markdown 文章索引，展示最近更新的 6 篇资料。</p>
+      </div>
+      <div class="latest-list" data-latest-articles></div>
+    </section>
+    <section class="section recent-home">
+      <div class="section-heading">
+        <h2>最近浏览</h2>
+        <p>保存在当前浏览器中，方便继续阅读。</p>
+      </div>
+      <div class="recent-list" data-recent-articles></div>
+    </section>
   </main>
 
   <footer class="site-footer">
@@ -71,7 +87,10 @@
       <div><h2>教学寄语</h2><p>语文学习既要有慢功夫，也要有少年气。愿同学们读得进文字，也说得出自己的判断。</p></div>
     </div>
   </footer>
+  <script src="data/articles-data.js"></script>
+  <script src="js/articles.js"></script>
   <script src="js/materials.js"></script>
   <script src="js/materials-app.js"></script>
+  <script src="js/reader-tools.js"></script>
 </body>
 </html>

@@ -1,0 +1,93 @@
+window.GDTK_ARTICLES = [
+  {
+    "title": "“月”意象归纳",
+    "column": "诗词曲赋",
+    "section": "shici",
+    "summary": "归纳诗歌中“月”意象的常见情感和答题表达。",
+    "tags": [
+      "诗歌意象",
+      "月",
+      "诗词赏析"
+    ],
+    "date": "2026-05-17",
+    "url": "articles/shici/yue-yixiang.html",
+    "source": "content/shici/yue-yixiang.md",
+    "generatedFromMarkdown": true
+  },
+  {
+    "title": "《红楼梦》人物关系",
+    "column": "名著导读",
+    "section": "mingzhu",
+    "summary": "梳理《红楼梦》主要人物关系和高频考点。",
+    "tags": [
+      "名著人物",
+      "红楼梦",
+      "人物关系"
+    ],
+    "date": "2026-05-17",
+    "url": "articles/mingzhu/hongloumeng-renwu.html",
+    "source": "content/mingzhu/hongloumeng-renwu.md",
+    "generatedFromMarkdown": true
+  },
+  {
+    "title": "必修上第一单元学案",
+    "column": "备课资源",
+    "section": "beike",
+    "summary": "适合课堂使用的单元学案模板和学习任务设计。",
+    "tags": [
+      "备课",
+      "学案",
+      "必修上"
+    ],
+    "date": "2026-05-17",
+    "url": "articles/beike/bixiu-shang-danyi.html",
+    "source": "content/beike/bixiu-shang-danyi.md",
+    "generatedFromMarkdown": true
+  },
+  {
+    "title": "高频实词“信”用法整理",
+    "column": "文言文研习",
+    "section": "wenyan",
+    "summary": "归纳文言实词“信”的常见义项、例句和迁移方法。",
+    "tags": [
+      "文言实词",
+      "信",
+      "翻译"
+    ],
+    "date": "2026-05-17",
+    "url": "articles/wenyan/shi-ci-xin.html",
+    "source": "content/wenyan/shi-ci-xin.md",
+    "generatedFromMarkdown": true
+  },
+  {
+    "title": "青年成长类作文素材",
+    "column": "作文专区",
+    "section": "zuowen",
+    "summary": "适用于成长、突破、时代青年等作文主题。",
+    "tags": [
+      "青年",
+      "成长",
+      "奋斗",
+      "作文"
+    ],
+    "date": "2026-05-17",
+    "url": "articles/zuowen/qingnian-chengzhang.html",
+    "source": "content/zuowen/qingnian-chengzhang.md",
+    "generatedFromMarkdown": true
+  },
+  {
+    "title": "小说环境描写作用题",
+    "column": "现代文阅读",
+    "section": "yuedu",
+    "summary": "整理小说阅读中环境描写作用题的常见答题角度。",
+    "tags": [
+      "小说阅读",
+      "环境描写",
+      "作用题"
+    ],
+    "date": "2026-05-17",
+    "url": "articles/yuedu/xiaoshuo-huanjing.html",
+    "source": "content/yuedu/xiaoshuo-huanjing.md",
+    "generatedFromMarkdown": true
+  }
+];
