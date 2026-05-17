@@ -29,6 +29,7 @@
 
   function linkPath(url) {
     if (!url || /^(https?:|mailto:|#|\/)/.test(url)) return url || "#";
+
     return window.location.pathname.includes("/pages/") || window.location.pathname.includes("/articles/")
       ? `../${url}`
       : url;
@@ -139,15 +140,13 @@
     return articleList?.dataset?.section || "";
   }
 
-  function shouldLoadSupabaseArticles() {
+  function shouldLoadSupabaseArticlesForSection() {
     const section = currentSection();
     return Boolean(articleList && supabaseSections.has(section));
   }
 
-  if (shouldLoadSupabaseArticles()) {
-    const section = currentSection();
-
-    fetch(`/api/articles?section=${encodeURIComponent(section)}`)
+  function loadSupabaseArticles(endpoint) {
+    return fetch(endpoint)
       .then((response) => {
         if (!response.ok) throw new Error("supabase articles not found");
         return response.json();
@@ -163,7 +162,16 @@
         boot(articles);
       })
       .catch(loadLocalArticles);
+  }
 
+  if (shouldLoadSupabaseArticlesForSection()) {
+    const section = currentSection();
+    loadSupabaseArticles(`/api/articles?section=${encodeURIComponent(section)}`);
+    return;
+  }
+
+  if (latestContainer && !articleList) {
+    loadSupabaseArticles("/api/articles");
     return;
   }
 
