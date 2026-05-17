@@ -1,5 +1,6 @@
 "use server";
 
+import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { createClient } from "../../../lib/supabase/server";
 
@@ -150,4 +151,53 @@ export async function updateArticleAction(
   }
 
   redirect("/admin/articles");
+}
+
+export async function deleteArticleAction(id: string): Promise<ArticleFormState> {
+  const supabase = createClient();
+
+  if (!supabase) {
+    return {
+      message: "缺少 NEXT_PUBLIC_SUPABASE_URL 或 NEXT_PUBLIC_SUPABASE_ANON_KEY 环境变量。"
+    };
+  }
+
+  const {
+    data: { user },
+    error: userError
+  } = await supabase.auth.getUser();
+
+  if (userError || !user) {
+    return {
+      message: userError?.message ?? "请先登录后再删除文章。"
+    };
+  }
+
+  const { data: article, error: articleError } = await supabase
+    .from("articles")
+    .select("id,author_id")
+    .eq("id", id)
+    .single();
+
+  if (articleError || !article) {
+    return { message: "找不到文章，或你没有权限删除这篇文章。" };
+  }
+
+  if (article.author_id !== user.id) {
+    return { message: "你只能删除自己的文章。" };
+  }
+
+  const { error: deleteError } = await supabase
+    .from("articles")
+    .delete()
+    .eq("id", id)
+    .eq("author_id", user.id);
+
+  if (deleteError) {
+    return { message: deleteError.message };
+  }
+
+  revalidatePath("/admin/articles");
+
+  return { message: "文章已删除。" };
 }
