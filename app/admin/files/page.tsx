@@ -1,4 +1,5 @@
 import Link from "next/link";
+import DeleteFileButton from "./DeleteFileButton";
 import { redirect } from "next/navigation";
 import { createClient } from "../../../lib/supabase/server";
 
@@ -55,11 +56,7 @@ export default async function AdminFilesPage() {
     .order("updated_at", { ascending: false });
 
   const files = (data ?? []) as TeachingFile[];
-  const message = error
-    ? error.message
-    : files.length
-      ? "按更新时间倒序显示当前账号上传的备课文件。"
-      : "暂无备课文件，请先上传";
+  const message = error ? error.message : files.length ? "按更新时间倒序显示当前账号上传的备课文件。" : "暂无备课文件，请先上传";
 
   return (
     <main className="admin-shell">
@@ -102,9 +99,12 @@ export default async function AdminFilesPage() {
                     <td>{file.is_public_for_students ? "是" : "否"}</td>
                     <td>{formatDate(file.updated_at)}</td>
                     <td>
-                      <Link className="admin-link-button" href={`/admin/files/${file.id}/download`}>
-                        查看文件
-                      </Link>
+                      <div className="admin-actions">
+                        <Link className="admin-link-button" href={`/admin/files/${file.id}/download`}>
+                          查看文件
+                        </Link>
+                        <DeleteFileButton fileId={file.id} />
+                      </div>
                     </td>
                   </tr>
                 ))}
