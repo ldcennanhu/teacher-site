@@ -7,17 +7,16 @@ type DeleteMaterialButtonProps = {
 };
 
 export default function DeleteMaterialButton({ id }: DeleteMaterialButtonProps) {
-  const deleteMaterial = deleteMaterialAction.bind(null, id);
-
   return (
     <form
-      action={deleteMaterial}
+      action={deleteMaterialAction}
       onSubmit={(event) => {
-        if (!confirm("确定要删除这张素材卡片吗？此操作不可恢复。")) {
+        if (!window.confirm("确定要删除这张素材卡片吗？此操作不可恢复。")) {
           event.preventDefault();
         }
       }}
     >
+      <input type="hidden" name="id" value={id} />
       <button className="admin-link-button" type="submit">
         删除
       </button>
