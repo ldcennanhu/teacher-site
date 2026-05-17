@@ -1,5 +1,6 @@
 "use server";
 
+import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { createClient } from "../../../lib/supabase/server";
 
@@ -107,4 +108,56 @@ export async function uploadTeachingFileAction(
   }
 
   redirect("/admin/files");
+}
+
+export async function deleteTeachingFileAction(formData: FormData) {
+  const supabase = createClient();
+
+  if (!supabase) {
+    throw new Error("缺少 NEXT_PUBLIC_SUPABASE_URL 或 NEXT_PUBLIC_SUPABASE_ANON_KEY 环境变量。");
+  }
+
+  const id = getString(formData, "id");
+
+  if (!id) {
+    throw new Error("缺少备课文件 id。");
+  }
+
+  const {
+    data: { user },
+    error: userError
+  } = await supabase.auth.getUser();
+
+  if (userError || !user) {
+    throw new Error(userError?.message ?? "请先登录后再删除备课文件。");
+  }
+
+  const { data: file, error: fileError } = await supabase
+    .from("teaching_files")
+    .select("file_path")
+    .eq("id", id)
+    .eq("author_id", user.id)
+    .single<{ file_path: string | null }>();
+
+  if (fileError || !file?.file_path) {
+    throw new Error("未找到可删除的备课文件。");
+  }
+
+  const { error: storageError } = await supabase.storage.from(bucketName).remove([file.file_path]);
+
+  if (storageError) {
+    throw new Error(storageError.message);
+  }
+
+  const { error: deleteError } = await supabase
+    .from("teaching_files")
+    .delete()
+    .eq("id", id)
+    .eq("author_id", user.id);
+
+  if (deleteError) {
+    throw new Error(deleteError.message);
+  }
+
+  revalidatePath("/admin/files");
 }
