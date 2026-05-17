@@ -22,6 +22,10 @@ function ensureDir(dir) {
   fs.mkdirSync(dir, { recursive: true });
 }
 
+function readJson(filePath) {
+  return JSON.parse(fs.readFileSync(filePath, "utf8").replace(/^\uFEFF/, ""));
+}
+
 function escapeHtml(value) {
   return String(value || "")
     .replace(/&/g, "&amp;")
@@ -321,7 +325,7 @@ function buildArticles() {
   }).sort((a, b) => String(b.date).localeCompare(String(a.date)) || a.title.localeCompare(b.title, "zh-CN"));
 
   const currentIndex = fs.existsSync(searchIndexPath)
-    ? JSON.parse(fs.readFileSync(searchIndexPath, "utf8"))
+    ? readJson(searchIndexPath)
     : [];
 
   const manualIndex = currentIndex.filter((item) => !String(item.url || "").startsWith("articles/"));
