@@ -1,6 +1,19 @@
 {
   "scripts": {
-    "build": "node scripts/build-articles.js"
+    "dev": "next dev",
+    "build": "node scripts/build-articles.js && next build",
+    "start": "next start"
   },
-  "devDependencies": {}
+  "dependencies": {
+    "@supabase/ssr": "...",
+    "@supabase/supabase-js": "...",
+    "next": "...",
+    "react": "...",
+    "react-dom": "..."
+  },
+  "devDependencies": {
+    "@types/node": "...",
+    "@types/react": "...",
+    "typescript": "..."
+  }
 }
