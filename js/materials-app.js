@@ -116,16 +116,20 @@
       return;
     }
 
-    grid.innerHTML = rows.map((item, index) => `
-      <article class="material-card" role="button" tabindex="0" data-index="${index}">
-        <div class="material-meta">${escapeHtml(item.topic)}</div>
-        <h2>${escapeHtml(item.title)}</h2>
-        <p>${escapeHtml(item.summary)}</p>
-        <div class="material-tags">${item.tags.map((tag) => `<span>${escapeHtml(tag)}</span>`).join("")}</div>
-        <blockquote>${escapeHtml(item.mainQuote)}</blockquote>
-        <ul>${item.points.map((point) => `<li>${escapeHtml(point)}</li>`).join("")}</ul>
-      </article>
-    `).join("");
+    grid.innerHTML = rows.map((item, index) => {
+      const order = String(index + 1).padStart(2, "0");
+
+      return `
+        <article class="material-card" role="button" tabindex="0" data-index="${index}">
+          <div class="material-meta">${order} / ${escapeHtml(item.topic)}</div>
+          <h2>${escapeHtml(item.title)}</h2>
+          <p>${escapeHtml(item.summary)}</p>
+          <div class="material-tags">${item.tags.map((tag) => `<span>${escapeHtml(tag)}</span>`).join("")}</div>
+          <blockquote>${escapeHtml(item.mainQuote)}</blockquote>
+          <ul>${item.points.map((point) => `<li>${escapeHtml(point)}</li>`).join("")}</ul>
+        </article>
+      `;
+    }).join("");
   }
 
   function fillList(target, items) {
