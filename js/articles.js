@@ -4,6 +4,15 @@
 
   if (!articleList && !latestContainer) return;
 
+  const supabaseSections = new Set([
+    "zuowen",
+    "wenyan",
+    "shici",
+    "yuedu",
+    "mingzhu",
+    "beike"
+  ]);
+
   function escapeHtml(value) {
     return String(value || "")
       .replace(/&/g, "&amp;")
@@ -19,7 +28,8 @@
   }
 
   function linkPath(url) {
-    if (!url || /^(https?:|mailto:|#)/.test(url)) return url || "#";
+    if (!url || /^(https?:|mailto:|#|\/)/.test(url)) return url || "#";
+
     return window.location.pathname.includes("/pages/") || window.location.pathname.includes("/articles/")
       ? `../${url}`
       : url;
@@ -31,6 +41,7 @@
 
   function articleCard(article) {
     const tags = (article.tags || []).map((tag) => `<span>${escapeHtml(tag)}</span>`).join("");
+
     return `
       <article class="article-list-card">
         <div>
@@ -49,6 +60,7 @@
 
   function renderArticleList(articles) {
     if (!articleList) return;
+
     const section = articleList.dataset.section;
     const filtered = sortByDate(articles.filter((article) => article.section === section));
 
@@ -62,6 +74,7 @@
 
   function renderLatest(articles) {
     if (!latestContainer) return;
+
     const latest = sortByDate(articles).slice(0, 6);
 
     if (!latest.length) {
@@ -93,16 +106,74 @@
     if (articleList) {
       articleList.innerHTML = '<p class="empty-note">文章数据加载失败，请检查 data/articles.json。</p>';
     }
+
     if (latestContainer) {
       latestContainer.innerHTML = '<p class="empty-note">暂无更新，资料整理中。</p>';
     }
   }
 
-  fetch(dataPath("articles.json"))
-    .then((response) => {
-      if (!response.ok) throw new Error("articles data not found");
-      return response.json();
-    })
-    .then(boot)
-    .catch(fail);
+  function loadLocalArticles() {
+    return fetch(dataPath("articles.json"))
+      .then((response) => {
+        if (!response.ok) throw new Error("articles data not found");
+        return response.json();
+      })
+      .then(boot)
+      .catch(fail);
+  }
+
+  function normalizeSupabaseArticles(data) {
+    if (!Array.isArray(data)) return [];
+
+    return data.map((article) => ({
+      title: article.title || "",
+      section: article.section || "",
+      category: article.category || "",
+      summary: article.summary || "",
+      tags: Array.isArray(article.tags) ? article.tags : [],
+      date: article.date || article.published_at || article.updated_at || "",
+      url: article.url || "#"
+    }));
+  }
+
+  function currentSection() {
+    return articleList?.dataset?.section || "";
+  }
+
+  function shouldLoadSupabaseArticlesForSection() {
+    const section = currentSection();
+    return Boolean(articleList && supabaseSections.has(section));
+  }
+
+  function loadSupabaseArticles(endpoint) {
+    return fetch(endpoint)
+      .then((response) => {
+        if (!response.ok) throw new Error("supabase articles not found");
+        return response.json();
+      })
+      .then((data) => {
+        const articles = normalizeSupabaseArticles(data);
+
+        if (!articles.length) {
+          loadLocalArticles();
+          return;
+        }
+
+        boot(articles);
+      })
+      .catch(loadLocalArticles);
+  }
+
+  if (shouldLoadSupabaseArticlesForSection()) {
+    const section = currentSection();
+    loadSupabaseArticles(`/api/articles?section=${encodeURIComponent(section)}`);
+    return;
+  }
+
+  if (latestContainer && !articleList) {
+    loadSupabaseArticles("/api/articles");
+    return;
+  }
+
+  loadLocalArticles();
 })();
