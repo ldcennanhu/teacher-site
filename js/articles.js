@@ -4,6 +4,15 @@
 
   if (!articleList && !latestContainer) return;
 
+  const supabaseSections = new Set([
+    "zuowen",
+    "wenyan",
+    "shici",
+    "yuedu",
+    "mingzhu",
+    "beike"
+  ]);
+
   function escapeHtml(value) {
     return String(value || "")
       .replace(/&/g, "&amp;")
@@ -19,7 +28,7 @@
   }
 
   function linkPath(url) {
-    if (!url || /^(https?:|mailto:|#)/.test(url)) return url || "#";
+    if (!url || /^(https?:|mailto:|#|\/)/.test(url)) return url || "#";
     return window.location.pathname.includes("/pages/") || window.location.pathname.includes("/articles/")
       ? `../${url}`
       : url;
@@ -31,6 +40,7 @@
 
   function articleCard(article) {
     const tags = (article.tags || []).map((tag) => `<span>${escapeHtml(tag)}</span>`).join("");
+
     return `
       <article class="article-list-card">
         <div>
@@ -49,6 +59,7 @@
 
   function renderArticleList(articles) {
     if (!articleList) return;
+
     const section = articleList.dataset.section;
     const filtered = sortByDate(articles.filter((article) => article.section === section));
 
@@ -62,6 +73,7 @@
 
   function renderLatest(articles) {
     if (!latestContainer) return;
+
     const latest = sortByDate(articles).slice(0, 6);
 
     if (!latest.length) {
@@ -93,6 +105,7 @@
     if (articleList) {
       articleList.innerHTML = '<p class="empty-note">文章数据加载失败，请检查 data/articles.json。</p>';
     }
+
     if (latestContainer) {
       latestContainer.innerHTML = '<p class="empty-note">暂无更新，资料整理中。</p>';
     }
@@ -122,12 +135,19 @@
     }));
   }
 
+  function currentSection() {
+    return articleList?.dataset?.section || "";
+  }
+
   function shouldLoadSupabaseArticles() {
-    return articleList && articleList.dataset.section === "zuowen";
+    const section = currentSection();
+    return Boolean(articleList && supabaseSections.has(section));
   }
 
   if (shouldLoadSupabaseArticles()) {
-    fetch("/api/articles?section=zuowen")
+    const section = currentSection();
+
+    fetch(`/api/articles?section=${encodeURIComponent(section)}`)
       .then((response) => {
         if (!response.ok) throw new Error("supabase articles not found");
         return response.json();
@@ -143,6 +163,7 @@
         boot(articles);
       })
       .catch(loadLocalArticles);
+
     return;
   }
 
