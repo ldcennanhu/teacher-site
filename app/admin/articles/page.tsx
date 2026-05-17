@@ -1,4 +1,5 @@
 import Link from "next/link";
+import DeleteArticleButton from "./DeleteArticleButton";
 import { createClient } from "../../../lib/supabase/server";
 
 type Article = {
@@ -82,9 +83,12 @@ export default async function AdminArticlesPage() {
                     <td>{article.is_pinned ? "是" : "否"}</td>
                     <td>{formatDate(article.updated_at)}</td>
                     <td>
-                      <Link className="admin-link-button" href={`/admin/articles/${article.id}/edit`}>
-                        编辑
-                      </Link>
+                      <div className="admin-actions">
+                        <Link className="admin-link-button" href={`/admin/articles/${article.id}/edit`}>
+                          编辑
+                        </Link>
+                        <DeleteArticleButton id={article.id} />
+                      </div>
                     </td>
                   </tr>
                 ))}
