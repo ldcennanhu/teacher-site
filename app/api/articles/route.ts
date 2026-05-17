@@ -35,7 +35,7 @@ export async function GET(request: NextRequest) {
   try {
     let query = supabase
       .from("articles")
-     .select("title,slug,section,category,summary,tags,updated_at,published_at")
+      .select("title,slug,section,category,summary,tags,updated_at,published_at")
       .eq("status", "published")
       .eq("visibility", "public")
       .order("is_pinned", { ascending: false })
