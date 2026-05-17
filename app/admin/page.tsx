@@ -27,6 +27,14 @@ export default async function AdminHomePage() {
           </article>
 
           <article className="admin-card">
+            <h2>备课文件</h2>
+            <p>上传和管理 PPT、PDF、Word、学案、练习题等备课资料。</p>
+            <Link className="admin-button" href="/admin/files">
+              进入文件
+            </Link>
+          </article>
+
+          <article className="admin-card">
             <h2>站点预览</h2>
             <p>保留原静态内容生成流程，便于继续发布教学资料。</p>
             <a className="admin-button" href="/index.html">
