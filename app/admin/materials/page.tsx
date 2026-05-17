@@ -1,14 +1,14 @@
 import Link from "next/link";
 import { createClient } from "../../../lib/supabase/server";
-import { deleteMaterialAction } from "./actions";
+import DeleteMaterialButton from "./DeleteMaterialButton";
 
 type Material = {
   id: string;
   title: string | null;
   topic: string | null;
   status: string | null;
-  is_pinned: boolean | null;
   visibility: string | null;
+  is_pinned: boolean | null;
   updated_at: string | null;
 };
 
@@ -39,7 +39,7 @@ export default async function AdminMaterialsPage() {
     } else {
       const { data, error } = await supabase
         .from("materials")
-        .select("id,title,topic,status,is_pinned,visibility,updated_at")
+        .select("id,title,topic,status,visibility,is_pinned,updated_at")
         .eq("author_id", user.id)
         .order("updated_at", { ascending: false });
 
@@ -102,13 +102,7 @@ export default async function AdminMaterialsPage() {
                         >
                           编辑
                         </Link>
-
-                        <form action={deleteMaterialAction}>
-                          <input name="id" type="hidden" value={material.id} />
-                          <button className="admin-link-button" type="submit">
-                            删除
-                          </button>
-                        </form>
+                        <DeleteMaterialButton id={material.id} />
                       </div>
                     </td>
                   </tr>
