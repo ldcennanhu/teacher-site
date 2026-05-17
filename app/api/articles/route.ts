@@ -39,7 +39,8 @@ export async function GET(request: NextRequest) {
       .eq("status", "published")
       .eq("visibility", "public")
       .order("is_pinned", { ascending: false })
-      .order("updated_at", { ascending: false });
+      .order("updated_at", { ascending: false })
+      .limit(30);
 
     if (section) {
       query = query.eq("section", section);
