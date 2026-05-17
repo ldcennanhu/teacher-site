@@ -98,11 +98,53 @@
     }
   }
 
-  fetch(dataPath("articles.json"))
-    .then((response) => {
-      if (!response.ok) throw new Error("articles data not found");
-      return response.json();
-    })
-    .then(boot)
-    .catch(fail);
+  function loadLocalArticles() {
+    return fetch(dataPath("articles.json"))
+      .then((response) => {
+        if (!response.ok) throw new Error("articles data not found");
+        return response.json();
+      })
+      .then(boot)
+      .catch(fail);
+  }
+
+  function normalizeSupabaseArticles(data) {
+    if (!Array.isArray(data)) return [];
+
+    return data.map((article) => ({
+      title: article.title || "",
+      section: article.section || "",
+      category: article.category || "",
+      summary: article.summary || "",
+      tags: Array.isArray(article.tags) ? article.tags : [],
+      date: article.date || article.published_at || article.updated_at || "",
+      url: article.url || "#"
+    }));
+  }
+
+  function shouldLoadSupabaseArticles() {
+    return articleList && articleList.dataset.section === "zuowen";
+  }
+
+  if (shouldLoadSupabaseArticles()) {
+    fetch("/api/articles?section=zuowen")
+      .then((response) => {
+        if (!response.ok) throw new Error("supabase articles not found");
+        return response.json();
+      })
+      .then((data) => {
+        const articles = normalizeSupabaseArticles(data);
+
+        if (!articles.length) {
+          loadLocalArticles();
+          return;
+        }
+
+        boot(articles);
+      })
+      .catch(loadLocalArticles);
+    return;
+  }
+
+  loadLocalArticles();
 })();
