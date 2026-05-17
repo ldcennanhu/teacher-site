@@ -45,6 +45,8 @@
   async function loadRemoteMaterials() {
     if (!window.fetch) return;
 
+    const staticMaterials = materials();
+
     try {
       const response = await window.fetch("/api/materials", {
         headers: { Accept: "application/json" },
@@ -54,9 +56,22 @@
       if (!response.ok) return;
 
       const data = await response.json();
-      if (Array.isArray(data) && data.length) {
-        window.GDTK_MATERIALS = data.map(normalizeMaterial);
-      }
+      if (!Array.isArray(data) || !data.length) return;
+
+      const remoteMaterials = data.map(normalizeMaterial);
+      const merged = [];
+      const seen = new Set();
+
+      remoteMaterials.concat(staticMaterials).forEach((item) => {
+        const key = item.id || item.title;
+
+        if (!key || seen.has(key)) return;
+
+        seen.add(key);
+        merged.push(item);
+      });
+
+      window.GDTK_MATERIALS = merged.slice(0, 12);
     } catch (error) {
       window.console.warn("素材卡片接口暂不可用，继续显示静态素材。", error);
     }
