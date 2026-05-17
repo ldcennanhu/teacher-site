@@ -69,7 +69,7 @@
       title: article.dataset.title || document.title.replace("｜孤登塔客语文馆", ""),
       column: article.dataset.column || "",
       date: article.dataset.date || "",
-      url: window.location.href || article.dataset.url || currentUrl()
+      url: article.dataset.url || currentUrl()
     };
   }
 
@@ -151,10 +151,7 @@
     const toggle = toc.querySelector(".toc-toggle");
     const links = Array.from(toc.querySelectorAll("a"));
     toggle.addEventListener("click", () => toc.classList.toggle("open"));
-
-    links.forEach((link) => {
-      link.addEventListener("click", () => toc.classList.remove("open"));
-    });
+    links.forEach((link) => link.addEventListener("click", () => toc.classList.remove("open")));
 
     const observer = new IntersectionObserver((entries) => {
       const visible = entries
@@ -179,7 +176,7 @@
       }
 
       list.innerHTML = favorites.map((item) => `
-        <article class="favorite-card">
+        <article class="article-list-card">
           <div>
             <span class="data-meta">${escapeHtml(item.column)}</span>
             <h3>${escapeHtml(item.title)}</h3>
@@ -187,29 +184,28 @@
           </div>
           <div class="data-card-footer">
             <a class="read-link" href="${escapeHtml(item.url)}">阅读</a>
-            <button type="button" class="plain-action" data-remove-favorite="${escapeHtml(item.url)}">取消收藏</button>
+            <button class="read-link favorite-remove" type="button" data-remove-favorite="${escapeHtml(item.url)}">取消收藏</button>
           </div>
         </article>
       `).join("");
-    }
 
-    list.addEventListener("click", (event) => {
-      const button = event.target.closest("[data-remove-favorite]");
-      if (!button) return;
-      const url = button.dataset.removeFavorite;
-      writeStore(favoriteKey, readStore(favoriteKey).filter((item) => item.url !== url));
-      render();
-    });
+      list.querySelectorAll("[data-remove-favorite]").forEach((button) => {
+        button.addEventListener("click", () => {
+          writeStore(favoriteKey, readStore(favoriteKey).filter((item) => item.url !== button.dataset.removeFavorite));
+          render();
+        });
+      });
+    }
 
     render();
   }
 
+  const meta = articleMeta();
   createProgressBar();
   createBackTop();
-  const meta = articleMeta();
   saveRecent(meta);
+  renderRecent();
   setupFavorite(meta);
   setupToc();
   setupFavoritesPage();
-  renderRecent();
 })();

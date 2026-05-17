@@ -1,93 +1,257 @@
-window.GDTK_ARTICLES = [
-  {
-    "title": "“月”意象归纳",
-    "column": "诗词曲赋",
-    "section": "shici",
-    "summary": "归纳诗歌中“月”意象的常见情感和答题表达。",
-    "tags": [
-      "诗歌意象",
-      "月",
-      "诗词赏析"
-    ],
-    "date": "2026-05-17",
-    "url": "articles/shici/yue-yixiang.html",
-    "source": "content/shici/yue-yixiang.md",
-    "generatedFromMarkdown": true
-  },
-  {
-    "title": "《红楼梦》人物关系",
-    "column": "名著导读",
-    "section": "mingzhu",
-    "summary": "梳理《红楼梦》主要人物关系和高频考点。",
-    "tags": [
-      "名著人物",
-      "红楼梦",
-      "人物关系"
-    ],
-    "date": "2026-05-17",
-    "url": "articles/mingzhu/hongloumeng-renwu.html",
-    "source": "content/mingzhu/hongloumeng-renwu.md",
-    "generatedFromMarkdown": true
-  },
-  {
-    "title": "必修上第一单元学案",
-    "column": "备课资源",
-    "section": "beike",
-    "summary": "适合课堂使用的单元学案模板和学习任务设计。",
-    "tags": [
-      "备课",
-      "学案",
-      "必修上"
-    ],
-    "date": "2026-05-17",
-    "url": "articles/beike/bixiu-shang-danyi.html",
-    "source": "content/beike/bixiu-shang-danyi.md",
-    "generatedFromMarkdown": true
-  },
-  {
-    "title": "高频实词“信”用法整理",
-    "column": "文言文研习",
-    "section": "wenyan",
-    "summary": "归纳文言实词“信”的常见义项、例句和迁移方法。",
-    "tags": [
-      "文言实词",
-      "信",
-      "翻译"
-    ],
-    "date": "2026-05-17",
-    "url": "articles/wenyan/shi-ci-xin.html",
-    "source": "content/wenyan/shi-ci-xin.md",
-    "generatedFromMarkdown": true
-  },
-  {
-    "title": "青年成长类作文素材",
-    "column": "作文专区",
-    "section": "zuowen",
-    "summary": "适用于成长、突破、时代青年等作文主题。",
-    "tags": [
-      "青年",
-      "成长",
-      "奋斗",
-      "作文"
-    ],
-    "date": "2026-05-17",
-    "url": "articles/zuowen/qingnian-chengzhang.html",
-    "source": "content/zuowen/qingnian-chengzhang.md",
-    "generatedFromMarkdown": true
-  },
-  {
-    "title": "小说环境描写作用题",
-    "column": "现代文阅读",
-    "section": "yuedu",
-    "summary": "整理小说阅读中环境描写作用题的常见答题角度。",
-    "tags": [
-      "小说阅读",
-      "环境描写",
-      "作用题"
-    ],
-    "date": "2026-05-17",
-    "url": "articles/yuedu/xiaoshuo-huanjing.html",
-    "source": "content/yuedu/xiaoshuo-huanjing.md",
-    "generatedFromMarkdown": true
-  }
+﻿window.GDTK_ARTICLES = [
+    {
+        "title":  "关系型思辨作文审题方法",
+        "section":  "zuowen",
+        "category":  "作文专区",
+        "tags":  [
+                     "作文",
+                     "思辨",
+                     "审题",
+                     "议论文"
+                 ],
+        "summary":  "梳理二元、三元关系型作文的审题路径，帮助学生把材料关系转化为清晰论点。",
+        "date":  "2026-05-17",
+        "url":  "articles/zuowen/guanxi-si-bian-shen-ti.html"
+    },
+    {
+        "title":  "高考作文素材如何转化为论证",
+        "section":  "zuowen",
+        "category":  "作文专区",
+        "tags":  [
+                     "作文",
+                     "素材",
+                     "论证",
+                     "写作技巧"
+                 ],
+        "summary":  "从素材选择、压缩叙述到观点分析，训练学生把素材写成论证而不是人物简介。",
+        "date":  "2026-05-17",
+        "url":  "articles/zuowen/sucai-zhuanhua-lunzheng.html"
+    },
+    {
+        "title":  "青年成长主题素材整理",
+        "section":  "zuowen",
+        "category":  "作文专区",
+        "tags":  [
+                     "作文",
+                     "青年",
+                     "成长",
+                     "素材"
+                 ],
+        "summary":  "围绕理想、担当、挫折、时代四个角度，整理青年成长类作文的写作思路。",
+        "date":  "2026-05-17",
+        "url":  "articles/zuowen/qingnian-chengzhang-zhuti.html"
+    },
+    {
+        "title":  "高频实词「信」用法整理",
+        "section":  "wenyan",
+        "category":  "文言文研习",
+        "tags":  [
+                     "文言文",
+                     "实词",
+                     "信",
+                     "翻译"
+                 ],
+        "summary":  "整理「信」的常见义项和翻译判断方法，帮助学生在语境中准确辨析。",
+        "date":  "2026-05-17",
+        "url":  "articles/wenyan/shi-ci-xin-yongfa.html"
+    },
+    {
+        "title":  "「之」字六类用法",
+        "section":  "wenyan",
+        "category":  "文言文研习",
+        "tags":  [
+                     "文言文",
+                     "虚词",
+                     "之",
+                     "句式"
+                 ],
+        "summary":  "归纳「之」的代词、助词、动词等常见用法，并提供课堂判断口诀。",
+        "date":  "2026-05-17",
+        "url":  "articles/wenyan/zhi-zi-liu-lei.html"
+    },
+    {
+        "title":  "文言翻译四步法",
+        "section":  "wenyan",
+        "category":  "文言文研习",
+        "tags":  [
+                     "文言文",
+                     "翻译",
+                     "方法",
+                     "考点"
+                 ],
+        "summary":  "用留、换、补、调四步处理文言翻译题，提升考场得分稳定性。",
+        "date":  "2026-05-17",
+        "url":  "articles/wenyan/wenyan-fanyi-si-bu.html"
+    },
+    {
+        "title":  "「月」意象归纳",
+        "section":  "shici",
+        "category":  "诗词曲赋",
+        "tags":  [
+                     "诗词",
+                     "诗歌",
+                     "意象",
+                     "月",
+                     "鉴赏"
+                 ],
+        "summary":  "整理古诗词中「月」的常见情感指向和答题表达，帮助学生快速迁移。",
+        "date":  "2026-05-17",
+        "url":  "articles/shici/yue-yixiang-guina.html"
+    },
+    {
+        "title":  "默写易错字整理",
+        "section":  "shici",
+        "category":  "诗词曲赋",
+        "tags":  [
+                     "诗词",
+                     "诗歌",
+                     "默写",
+                     "易错字",
+                     "古诗文"
+                 ],
+        "summary":  "从字形、同音、语义和句意四个角度整理古诗文默写易错点。",
+        "date":  "2026-05-17",
+        "url":  "articles/shici/moxie-yicuozhi.html"
+    },
+    {
+        "title":  "边塞诗常见情感",
+        "section":  "shici",
+        "category":  "诗词曲赋",
+        "tags":  [
+                     "诗词",
+                     "诗歌",
+                     "边塞诗",
+                     "情感",
+                     "鉴赏"
+                 ],
+        "summary":  "归纳边塞诗中的豪情、思乡、征战艰苦和历史反思等常见情感。",
+        "date":  "2026-05-17",
+        "url":  "articles/shici/biansai-shi-qinggan.html"
+    },
+    {
+        "title":  "小说环境描写作用题",
+        "section":  "yuedu",
+        "category":  "现代文阅读",
+        "tags":  [
+                     "现代文阅读",
+                     "小说",
+                     "环境描写",
+                     "答题方法"
+                 ],
+        "summary":  "整理小说阅读中自然环境、社会环境描写的常见作用和答题路径。",
+        "date":  "2026-05-17",
+        "url":  "articles/yuedu/xiaoshuo-huanjing-zuoyong.html"
+    },
+    {
+        "title":  "论述类文本设误角度",
+        "section":  "yuedu",
+        "category":  "现代文阅读",
+        "tags":  [
+                     "现代文阅读",
+                     "论述类",
+                     "设误",
+                     "选择题"
+                 ],
+        "summary":  "梳理论述类文本选择题常见设误方式，训练学生回到原文比对。",
+        "date":  "2026-05-17",
+        "url":  "articles/yuedu/lunshu-shewu-jiaodu.html"
+    },
+    {
+        "title":  "散文标题作用题",
+        "section":  "yuedu",
+        "category":  "现代文阅读",
+        "tags":  [
+                     "现代文阅读",
+                     "散文",
+                     "标题作用",
+                     "答题方法"
+                 ],
+        "summary":  "从内容、结构、情感、主题和表达效果五个角度分析散文标题。",
+        "date":  "2026-05-17",
+        "url":  "articles/yuedu/sanwen-biaoti-zuoyong.html"
+    },
+    {
+        "title":  "《红楼梦》人物关系",
+        "section":  "mingzhu",
+        "category":  "名著导读",
+        "tags":  [
+                     "名著",
+                     "红楼梦",
+                     "人物关系",
+                     "整本书阅读"
+                 ],
+        "summary":  "从家族结构、情感关系和人物对照入手，梳理《红楼梦》阅读抓手。",
+        "date":  "2026-05-17",
+        "url":  "articles/mingzhu/hongloumeng-renwu-guanxi.html"
+    },
+    {
+        "title":  "《乡土中国》核心概念",
+        "section":  "mingzhu",
+        "category":  "名著导读",
+        "tags":  [
+                     "名著",
+                     "乡土中国",
+                     "核心概念",
+                     "整本书阅读"
+                 ],
+        "summary":  "用学生易理解的方式梳理《乡土中国》的差序格局、礼治秩序等概念。",
+        "date":  "2026-05-17",
+        "url":  "articles/mingzhu/xiangtu-zhongguo-gainian.html"
+    },
+    {
+        "title":  "《边城》人物形象",
+        "section":  "mingzhu",
+        "category":  "名著导读",
+        "tags":  [
+                     "名著",
+                     "边城",
+                     "人物形象",
+                     "沈从文"
+                 ],
+        "summary":  "围绕翠翠、祖父、傩送等人物，分析《边城》的纯美人性与命运感。",
+        "date":  "2026-05-17",
+        "url":  "articles/mingzhu/biancheng-renwu-xingxiang.html"
+    },
+    {
+        "title":  "必修上第一单元学案",
+        "section":  "beike",
+        "category":  "备课资源",
+        "tags":  [
+                     "备课",
+                     "学案",
+                     "必修上",
+                     "课堂设计"
+                 ],
+        "summary":  "围绕青春价值与文学阅读，设计必修上第一单元的学习任务和课堂活动。",
+        "date":  "2026-05-17",
+        "url":  "articles/beike/bixiu-shang-danyi-xuean.html"
+    },
+    {
+        "title":  "月考作文讲评课件说明",
+        "section":  "beike",
+        "category":  "备课资源",
+        "tags":  [
+                     "备课",
+                     "作文讲评",
+                     "月考",
+                     "课堂设计"
+                 ],
+        "summary":  "提供月考作文讲评课的结构说明，强调审题、结构、素材转化和升格训练。",
+        "date":  "2026-05-17",
+        "url":  "articles/beike/yuekao-zuowen-jiangping.html"
+    },
+    {
+        "title":  "文言文翻译专题练习",
+        "section":  "beike",
+        "category":  "备课资源",
+        "tags":  [
+                     "备课",
+                     "文言文",
+                     "翻译",
+                     "练习"
+                 ],
+        "summary":  "设计文言翻译专题练习的课堂流程，突出关键词、句式和规范表达。",
+        "date":  "2026-05-17",
+        "url":  "articles/beike/wenyan-fanyi-zhuanti-lianxi.html"
+    }
 ];

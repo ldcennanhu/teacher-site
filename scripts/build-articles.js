@@ -218,8 +218,11 @@ function siteHeader(prefix, activeSection) {
     ["mingzhu", "名著导读", "mingzhu.html"],
     ["cards", "素材卡片墙", "pages/writing-cards-week20.html"],
     ["beike", "备课资源", "beike.html"],
+    ["study", "学习路径", "study-guide.html"],
+    ["updates", "更新日志", "updates.html"],
     ["about", "关于师者", "about.html"],
-    ["search", "搜索资料", "search.html"]
+    ["search", "搜索资料", "search.html"],
+    ["favorites", "我的收藏", "favorites.html"]
   ];
 
   const links = navItems.map(([key, label, href]) => {
@@ -305,14 +308,12 @@ function buildArticles() {
 
     const article = {
       title: parsed.meta.title,
-      column: parsed.meta.category,
       section,
+      category: parsed.meta.category,
       summary: parsed.meta.summary,
       tags: parsed.meta.tags || [],
       date: parsed.meta.date,
-      url: `articles/${section}/${slug}.html`,
-      source: path.relative(rootDir, filePath).replace(/\\/g, "/"),
-      generatedFromMarkdown: true
+      url: `articles/${section}/${slug}.html`
     };
 
     fs.writeFileSync(outputPath, articleTemplate({ meta: parsed.meta, html: markdownToHtml(parsed.body) }), "utf8");
@@ -323,17 +324,15 @@ function buildArticles() {
     ? JSON.parse(fs.readFileSync(searchIndexPath, "utf8"))
     : [];
 
-  const manualIndex = currentIndex.filter((item) => !item.generatedFromMarkdown);
+  const manualIndex = currentIndex.filter((item) => !String(item.url || "").startsWith("articles/"));
   const articleSearchIndex = generated.map((article) => ({
     title: article.title,
-    column: article.column,
     section: article.section,
+    category: article.category,
     summary: article.summary,
     tags: article.tags,
     date: article.date,
-    url: article.url,
-    generatedFromMarkdown: true,
-    source: article.source
+    url: article.url
   }));
 
   const searchIndex = [...manualIndex, ...articleSearchIndex];
