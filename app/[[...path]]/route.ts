@@ -12,6 +12,8 @@ const allowedRootFiles = new Set([
   "yuedu.html",
   "mingzhu.html",
   "beike.html",
+  "chinese.html",
+  "writing.html",
   "about.html",
   "search.html",
   "favorites.html",
@@ -53,11 +55,20 @@ function isAllowedPath(segments: string[]) {
     return true;
   }
 
-  if (segments.some((segment) => blockedSegments.has(segment) || segment.startsWith(".") || segment.includes("/") || segment.includes("\\"))) {
+  if (
+    segments.some(
+      (segment) =>
+        blockedSegments.has(segment) ||
+        segment.startsWith(".") ||
+        segment.includes("/") ||
+        segment.includes("\\")
+    )
+  ) {
     return false;
   }
 
   const [firstSegment] = segments;
+
   if (segments.length === 1) {
     return allowedRootFiles.has(firstSegment);
   }
@@ -75,11 +86,13 @@ async function readStaticFile(segments: string[]) {
   }
 
   const extension = path.extname(filePath).toLowerCase();
+
   if (!contentTypes[extension]) {
     return null;
   }
 
   const fileStat = await stat(filePath);
+
   if (!fileStat.isFile()) {
     return null;
   }
@@ -99,6 +112,7 @@ export async function GET(_request: NextRequest, { params }: { params: { path?: 
 
   try {
     const file = await readStaticFile(segments);
+
     if (!file) {
       return NextResponse.json({ error: "Not found" }, { status: 404 });
     }
