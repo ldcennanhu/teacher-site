@@ -1,4 +1,5 @@
 import Link from "next/link";
+import LogoutButton from "./LogoutButton";
 
 const adminLinks = [
   { href: "/admin", label: "后台首页" },
@@ -17,9 +18,12 @@ export default function AdminNav() {
             {link.label}
           </Link>
         ))}
+
         <a className="admin-button admin-button-secondary" href="/index.html">
           站点预览
         </a>
+
+        <LogoutButton />
       </div>
     </nav>
   );
