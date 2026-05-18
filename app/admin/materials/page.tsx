@@ -7,6 +7,8 @@ type Material = {
   id: string;
   title: string | null;
   topic: string | null;
+  year: number | null;
+  week: number | null;
   status: string | null;
   visibility: string | null;
   is_pinned: boolean | null;
@@ -29,15 +31,17 @@ export default async function AdminMaterialsPage() {
 
   const { data, error } = await supabase
     .from("materials")
-    .select("id,title,topic,status,visibility,is_pinned,updated_at")
+    .select("id,title,topic,year,week,status,visibility,is_pinned,updated_at")
     .eq("author_id", user.id)
+    .order("year", { ascending: false })
+    .order("week", { ascending: false })
     .order("updated_at", { ascending: false });
 
   const materials = (data ?? []) as Material[];
   const message = error
     ? error.message
     : materials.length
-      ? "按更新时间倒序显示当前登录用户创建的素材卡片。"
+      ? "按年份、周次和更新时间显示当前登录用户创建的素材卡片。"
       : "暂无素材卡片，请先新建。";
 
   return (
@@ -64,6 +68,8 @@ export default async function AdminMaterialsPage() {
               <thead>
                 <tr>
                   <th>标题 title</th>
+                  <th>年份 year</th>
+                  <th>周次 week</th>
                   <th>主题 topic</th>
                   <th>状态 status</th>
                   <th>可见性 visibility</th>
@@ -77,6 +83,8 @@ export default async function AdminMaterialsPage() {
                 {materials.map((material) => (
                   <tr key={material.id}>
                     <td>{material.title ?? "未命名"}</td>
+                    <td>{material.year ?? "-"}</td>
+                    <td>{material.week ?? "-"}</td>
                     <td>{material.topic ?? "-"}</td>
                     <td>{material.status ?? "draft"}</td>
                     <td>{material.visibility ?? "private"}</td>
