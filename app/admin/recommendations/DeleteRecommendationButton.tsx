@@ -7,16 +7,17 @@ type DeleteRecommendationButtonProps = {
 };
 
 export default function DeleteRecommendationButton({ id }: DeleteRecommendationButtonProps) {
+  const deleteRecommendation = deleteRecommendationAction.bind(null, id);
+
   return (
     <form
-      action={deleteRecommendationAction}
+      action={deleteRecommendation}
       onSubmit={(event) => {
-        if (!window.confirm("确定要删除这条首页推荐吗？此操作不可恢复。")) {
+        if (!confirm("确定要删除这条首页推荐吗？此操作不可恢复。")) {
           event.preventDefault();
         }
       }}
     >
-      <input type="hidden" name="id" value={id} />
       <button className="admin-link-button" type="submit">
         删除
       </button>
