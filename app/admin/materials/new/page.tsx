@@ -1,7 +1,10 @@
 import MaterialForm from "../MaterialForm";
 import { createMaterialAction } from "../actions";
+import { requireAdminUser } from "../../../../lib/admin/auth";
 
-export default function NewMaterialPage() {
+export default async function NewMaterialPage() {
+  await requireAdminUser();
+
   return (
     <main className="admin-shell">
       <section className="admin-card">
