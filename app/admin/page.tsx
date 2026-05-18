@@ -131,6 +131,14 @@ export default async function AdminHomePage() {
           </article>
 
           <article className="admin-card">
+            <h2>首页推荐</h2>
+            <p>管理首页重点推荐内容、金句、入口按钮和展示文案。</p>
+            <Link className="admin-button" href="/admin/recommendations">
+              进入推荐
+            </Link>
+          </article>
+
+          <article className="admin-card">
             <h2>站点预览</h2>
             <p>查看正式前台页面，确认发布内容展示效果。</p>
             <a className="admin-button" href="/index.html">
