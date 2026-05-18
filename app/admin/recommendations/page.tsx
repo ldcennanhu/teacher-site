@@ -1,8 +1,8 @@
 import Link from "next/link";
-import { createClient } from "../../../lib/supabase/server";
 import DeleteRecommendationButton from "./DeleteRecommendationButton";
-
 import AdminNav from "../AdminNav";
+import { requireAdminUser } from "../../../lib/admin/auth";
+
 type Recommendation = {
   id: string;
   title: string | null;
@@ -23,40 +23,26 @@ function formatDate(value: string | null) {
 }
 
 export default async function AdminRecommendationsPage() {
-  const supabase = createClient();
-  let recommendations: Recommendation[] = [];
-  let message = "配置 Supabase 后会从 home_recommendations 表读取当前登录用户的首页推荐。";
+  const { supabase, user } = await requireAdminUser();
 
-  if (supabase) {
-    const {
-      data: { user },
-      error: userError
-    } = await supabase.auth.getUser();
+  const { data, error } = await supabase
+    .from("home_recommendations")
+    .select("id,title,status,sort_order,updated_at")
+    .eq("author_id", user.id)
+    .order("sort_order", { ascending: true })
+    .order("updated_at", { ascending: false });
 
-    if (userError || !user) {
-      message = userError?.message ?? "请先登录后再管理首页推荐。";
-    } else {
-      const { data, error } = await supabase
-        .from("home_recommendations")
-        .select("id,title,status,sort_order,updated_at")
-        .eq("author_id", user.id)
-        .order("sort_order", { ascending: true })
-        .order("updated_at", { ascending: false });
-
-      if (error) {
-        message = error.message;
-      } else {
-        recommendations = data ?? [];
-        message = recommendations.length
-          ? "按排序值和更新时间显示当前登录用户创建的首页推荐。"
-          : "暂无首页推荐，请先新建。";
-      }
-    }
-  }
+  const recommendations = (data ?? []) as Recommendation[];
+  const message = error
+    ? error.message
+    : recommendations.length
+      ? "按排序值和更新时间显示当前账号创建的首页推荐。"
+      : "暂无首页推荐，请先新建。";
 
   return (
     <main className="admin-shell">
       <AdminNav />
+
       <section className="admin-card">
         <div className="admin-heading-row">
           <div>
@@ -83,6 +69,7 @@ export default async function AdminRecommendationsPage() {
                   <th>操作</th>
                 </tr>
               </thead>
+
               <tbody>
                 {recommendations.map((recommendation) => (
                   <tr key={recommendation.id}>
