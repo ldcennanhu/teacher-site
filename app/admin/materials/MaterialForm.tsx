@@ -16,6 +16,8 @@ export type MaterialFormValues = {
   quotes?: string[] | null;
   topics?: string[] | null;
   expand?: string | null;
+  year?: number | null;
+  week?: number | null;
   status?: string | null;
   is_pinned?: boolean | null;
   visibility?: string | null;
@@ -35,6 +37,12 @@ const statuses = [
 
 function listToText(items?: string[] | null) {
   return (items ?? []).join("\n");
+}
+
+function currentWeekNumber(date = new Date()) {
+  const firstDay = new Date(date.getFullYear(), 0, 1);
+  const dayOffset = Math.floor((Number(date) - Number(firstDay)) / 86400000);
+  return Math.max(1, Math.ceil((dayOffset + firstDay.getDay() + 1) / 7));
 }
 
 function SubmitButton({ label }: { label: string }) {
@@ -74,6 +82,34 @@ export default function MaterialForm({
   return (
     <form action={formAction}>
       {state.message ? <p className="admin-alert">{state.message}</p> : null}
+
+      <div className="admin-form-row">
+        <label>
+          年份 year
+          <input
+            name="year"
+            type="number"
+            min="2020"
+            max="2100"
+            defaultValue={material?.year ?? new Date().getFullYear()}
+            placeholder="如：2026"
+            required
+          />
+        </label>
+
+        <label>
+          周次 week
+          <input
+            name="week"
+            type="number"
+            min="1"
+            max="53"
+            defaultValue={material?.week ?? currentWeekNumber()}
+            placeholder="如：21"
+            required
+          />
+        </label>
+      </div>
 
       <label>
         标题 title
