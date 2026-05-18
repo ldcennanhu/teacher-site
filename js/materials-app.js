@@ -1,5 +1,8 @@
 (function () {
   const INTERVAL = 7000;
+  const DEFAULT_YEAR = 2026;
+  const DEFAULT_WEEK = 20;
+  const MATERIAL_LIMIT = 12;
 
   function asArray(value) {
     return Array.isArray(value) ? value : [];
@@ -16,8 +19,43 @@
     return "";
   }
 
+  function firstNumber() {
+    for (let index = 0; index < arguments.length; index += 1) {
+      const value = arguments[index];
+      const parsed = typeof value === "number" ? value : Number(value);
+
+      if (Number.isSafeInteger(parsed)) {
+        return parsed;
+      }
+    }
+
+    return null;
+  }
+
+  function readPositiveInt(value, fallback) {
+    const parsed = Number(value);
+    return Number.isSafeInteger(parsed) && parsed > 0 ? parsed : fallback;
+  }
+
+  function currentPeriod() {
+    const params = new URLSearchParams(window.location.search);
+
+    return {
+      year: readPositiveInt(params.get("year"), DEFAULT_YEAR),
+      week: readPositiveInt(params.get("week"), DEFAULT_WEEK)
+    };
+  }
+
+  function periodTitle(period) {
+    return `${period.year} 第${period.week}周高考作文素材卡片墙`;
+  }
+
+  function periodFileName(period) {
+    return `${period.year}-第${period.week}周高考作文素材卡片墙.doc`;
+  }
+
   function stripTopicOrder(text) {
-    return String(text || "").replace(/^\s*\d+\s*\/\s*/, "").trim();
+    return String(text || "").replace(/^(\s*\d+\s*\/\s*)+/, "").trim();
   }
 
   function normalizeMaterial(item) {
@@ -33,6 +71,8 @@
       quotes: asArray(item.quotes).filter(Boolean),
       topics: asArray(item.topics).filter(Boolean),
       expand: firstText(item.expand),
+      year: firstNumber(item.year),
+      week: firstNumber(item.week),
       updatedAt: firstText(item.updatedAt, item.updated_at),
       publishedAt: firstText(item.publishedAt, item.published_at)
     };
@@ -46,13 +86,42 @@
     return materials().map((item) => item.mainQuote).filter(Boolean);
   }
 
+  function updatePageCopy() {
+    const period = currentPeriod();
+    const title = periodTitle(period);
+    const weekTitle = `第${period.week}周素材卡片墙`;
+    const description = `${period.year}第${period.week}周高考作文素材卡片墙，整理人物素材、金句、适用话题与拓展素材。`;
+
+    document.title = `${title}｜孤登塔客语文馆`;
+
+    const metaDescription = document.querySelector('meta[name="description"]');
+    if (metaDescription) {
+      metaDescription.setAttribute("content", description);
+    }
+
+    const pageTitle = document.querySelector("[data-material-page-title]");
+    if (pageTitle) {
+      pageTitle.textContent = title;
+    }
+
+    const breadcrumbTitle = document.querySelector("[data-material-breadcrumb-title]");
+    if (breadcrumbTitle) {
+      breadcrumbTitle.textContent = weekTitle;
+    }
+  }
+
   async function loadRemoteMaterials() {
     if (!window.fetch) return;
 
+    const period = currentPeriod();
+    const params = new URLSearchParams({
+      year: String(period.year),
+      week: String(period.week)
+    });
     const staticMaterials = materials();
 
     try {
-      const response = await window.fetch("/api/materials", {
+      const response = await window.fetch(`/api/materials?${params.toString()}`, {
         headers: { Accept: "application/json" },
         cache: "no-store"
       });
@@ -75,7 +144,7 @@
         merged.push(item);
       });
 
-      window.GDTK_MATERIALS = merged.slice(0, 12);
+      window.GDTK_MATERIALS = merged.slice(0, MATERIAL_LIMIT);
     } catch (error) {
       window.console.warn("素材卡片接口暂不可用，继续显示静态素材。", error);
     }
@@ -194,6 +263,8 @@
   }
 
   function downloadMaterialsDoc() {
+    const period = currentPeriod();
+    const title = periodTitle(period);
     const rows = materials().map((item) => `
       <h2>${escapeHtml(item.title)}</h2>
       <p><strong>分类：</strong>${escapeHtml(item.topic)}</p>
@@ -214,7 +285,7 @@
       <html>
       <head>
         <meta charset="UTF-8">
-        <title>2026 第20周高考作文素材卡片墙</title>
+        <title>${escapeHtml(title)}</title>
         <style>
           body { font-family: "SimSun", "Microsoft YaHei", serif; line-height: 1.8; color: #2c2c2c; }
           h1 { text-align: center; font-size: 24px; }
@@ -224,7 +295,7 @@
         </style>
       </head>
       <body>
-        <h1>2026 第20周高考作文素材卡片墙</h1>
+        <h1>${escapeHtml(title)}</h1>
         ${rows}
       </body>
       </html>
@@ -234,7 +305,7 @@
     const url = URL.createObjectURL(blob);
     const link = document.createElement("a");
     link.href = url;
-    link.download = "2026-第20周高考作文素材卡片墙.doc";
+    link.download = periodFileName(period);
     document.body.appendChild(link);
     link.click();
     link.remove();
@@ -248,6 +319,7 @@
   }
 
   document.addEventListener("DOMContentLoaded", async () => {
+    updatePageCopy();
     await loadRemoteMaterials();
     renderMaterialCards();
     startCarousels();
