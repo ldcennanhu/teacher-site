@@ -82,54 +82,66 @@ export default async function SupabaseArticlePage({ params }: ArticlePageProps) 
   const sectionHref = sectionLinks[article.section] ?? "/";
   const tags = Array.isArray(article.tags) ? article.tags : [];
   const date = article.published_at ?? article.updated_at ?? null;
+  const articleUrl = `/articles/${article.section}/${article.slug}`;
 
   return (
-    <main className="article-detail-shell">
-      <article className="article-detail-card">
-        <nav className="article-breadcrumb">
-          <Link href="/">首页</Link>
-          <span>/</span>
-          <Link href={sectionHref}>{sectionLabel}</Link>
-          <span>/</span>
-          <span>正文</span>
-        </nav>
+    <>
+      <main className="article-detail-shell">
+        <article
+          className="article-detail-card"
+          data-reader-article
+          data-title={article.title}
+          data-column={sectionLabel}
+          data-date={formatDate(date)}
+          data-url={articleUrl}
+        >
+          <nav className="article-breadcrumb">
+            <Link href="/">首页</Link>
+            <span>/</span>
+            <Link href={sectionHref}>{sectionLabel}</Link>
+            <span>/</span>
+            <span>正文</span>
+          </nav>
 
-        <header className="article-detail-header">
-          <p className="article-eyebrow">
-            {sectionLabel}
-            {article.category ? ` · ${article.category}` : ""}
-          </p>
+          <header className="article-detail-header">
+            <p className="article-eyebrow">
+              {sectionLabel}
+              {article.category ? ` · ${article.category}` : ""}
+            </p>
 
-          <h1>{article.title}</h1>
+            <h1>{article.title}</h1>
 
-          {article.summary ? (
-            <p className="article-summary">{article.summary}</p>
-          ) : null}
+            {article.summary ? (
+              <p className="article-summary">{article.summary}</p>
+            ) : null}
 
-          <div className="article-detail-meta">
-            <span>更新：{formatDate(date)}</span>
-            <span>栏目：{sectionLabel}</span>
-          </div>
-
-          {tags.length ? (
-            <div className="article-detail-tags">
-              {tags.map((tag) => (
-                <span key={tag}>{tag}</span>
-              ))}
+            <div className="article-detail-meta">
+              <span>更新：{formatDate(date)}</span>
+              <span>栏目：{sectionLabel}</span>
             </div>
-          ) : null}
-        </header>
 
-        <section className="article-detail-content">
-          {renderParagraphs(article.content)}
-        </section>
+            {tags.length ? (
+              <div className="article-detail-tags">
+                {tags.map((tag) => (
+                  <span key={tag}>{tag}</span>
+                ))}
+              </div>
+            ) : null}
+          </header>
 
-        <footer className="article-detail-footer">
-          <Link className="article-back-link" href={sectionHref}>
-            ← 返回{sectionLabel}
-          </Link>
-        </footer>
-      </article>
-    </main>
+          <section className="article-detail-content">
+            {renderParagraphs(article.content)}
+          </section>
+
+          <footer className="article-detail-footer">
+            <Link className="article-back-link" href={sectionHref}>
+              ← 返回{sectionLabel}
+            </Link>
+          </footer>
+        </article>
+      </main>
+
+      <script src="/js/reader-tools.js" />
+    </>
   );
 }
