@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { notFound, redirect } from "next/navigation";
+import { notFound } from "next/navigation";
 import RecommendationForm, { type RecommendationFormValues } from "../../RecommendationForm";
 import { updateRecommendationAction } from "../../actions";
 import { createClient } from "../../../../../lib/supabase/server";
@@ -34,12 +34,25 @@ export default async function EditRecommendationPage({ params }: EditRecommendat
   } = await supabase.auth.getUser();
 
   if (userError || !user) {
-    redirect("/admin/login");
+    return (
+      <main className="admin-shell">
+        <section className="admin-card">
+          <p className="muted">Admin / Recommendations / Edit</p>
+          <h1>编辑首页推荐</h1>
+          <p>{userError?.message ?? "请先登录后再编辑首页推荐。"}</p>
+          <Link className="admin-button admin-button-secondary" href="/admin/recommendations">
+            取消返回
+          </Link>
+        </section>
+      </main>
+    );
   }
 
   const { data, error } = await supabase
     .from("home_recommendations")
-    .select("title,subtitle,description,link_text,link_url,slot,status,visibility,is_pinned")
+    .select(
+      "title,subtitle,description,link_text,link_url,slot,status,visibility,is_pinned,sort_order"
+    )
     .eq("id", params.id)
     .eq("author_id", user.id)
     .single<RecommendationFormValues>();
@@ -55,7 +68,11 @@ export default async function EditRecommendationPage({ params }: EditRecommendat
       <section className="admin-card">
         <p className="muted">Admin / Recommendations / Edit</p>
         <h1>编辑首页推荐</h1>
-        <RecommendationForm recommendation={data} action={updateAction} submitLabel="保存修改" />
+        <RecommendationForm
+          recommendation={data}
+          action={updateAction}
+          submitLabel="保存修改"
+        />
       </section>
     </main>
   );
