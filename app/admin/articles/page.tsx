@@ -1,7 +1,8 @@
 import Link from "next/link";
 import DeleteArticleButton from "./DeleteArticleButton";
-import { requireAdminUser } from "../../../lib/admin/auth";
+import { createClient } from "../../../lib/supabase/server";
 
+import AdminNav from "../AdminNav";
 type Article = {
   id: string;
   title: string | null;
@@ -24,25 +25,27 @@ function formatDate(value: string | null) {
 }
 
 export default async function AdminArticlesPage() {
-  const { supabase, user } = await requireAdminUser();
+  const supabase = createClient();
   let articles: Article[] = [];
-  let message = "配置 Supabase 后会从 articles 表读取当前账号的文章列表。";
+  let message = "配置 Supabase 后会从 articles 表读取文章列表。";
 
-  const { data, error } = await supabase
-    .from("articles")
-    .select("id,title,section,category,status,is_pinned,updated_at")
-    .eq("author_id", user.id)
-    .order("updated_at", { ascending: false });
+  if (supabase) {
+    const { data, error } = await supabase
+      .from("articles")
+      .select("id,title,section,category,status,is_pinned,updated_at")
+      .order("updated_at", { ascending: false });
 
-  if (error) {
-    message = error.message;
-  } else {
-    articles = data ?? [];
-    message = articles.length ? "按更新时间倒序显示当前账号的文章。" : "暂无文章，请先新建";
+    if (error) {
+      message = error.message;
+    } else {
+      articles = data ?? [];
+      message = articles.length ? "按更新时间倒序显示全部文章。" : "暂无文章，请先新建";
+    }
   }
 
   return (
     <main className="admin-shell">
+      <AdminNav />
       <section className="admin-card">
         <div className="admin-heading-row">
           <div>
