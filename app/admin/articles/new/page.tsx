@@ -1,7 +1,10 @@
 import ArticleForm from "../ArticleForm";
 import { createArticleAction } from "../actions";
+import { requireAdminUser } from "../../../../lib/admin/auth";
 
-export default function NewArticlePage() {
+export default async function NewArticlePage() {
+  await requireAdminUser();
+
   return (
     <main className="admin-shell">
       <section className="admin-card">
