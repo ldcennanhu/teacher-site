@@ -4,13 +4,36 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="description" content="站内搜索，快速查找孤登塔客语文馆中的作文、文言文、诗词、阅读、名著和备课资料。">
-  <title>搜索资料｜孤登塔客语文馆</title>
+  <title>搜索｜孤登塔客语文馆</title>
   <link rel="stylesheet" href="css/styles.css">
 </head>
 <body>
-  <header class="site-header"><nav class="nav"><a class="brand" href="index.html"><span class="seal">文</span><span class="brand-title">孤登塔客语文馆</span></a><div class="nav-links"><a href="zuowen.html">作文专区</a><a href="wenyan.html">文言文研习</a><a href="shici.html">诗词曲赋</a><a href="yuedu.html">现代文阅读</a><a href="mingzhu.html">名著导读</a><a href="pages/writing-cards-week20.html">素材卡片墙</a><a href="beike.html">备课资源</a><a href="study-guide.html">学习路径</a><a href="updates.html">更新日志</a><a href="about.html">关于师者</a><a class="active" href="search.html">搜索资料</a><a href="favorites.html">我的收藏</a></div></nav></header>
+  <header class="site-header">
+    <nav class="nav">
+      <a class="brand" href="index.html" aria-label="返回首页">
+        <span class="seal">文</span>
+        <span class="brand-title">孤登塔客语文馆</span>
+      </a>
+      <div class="nav-links" aria-label="主导航">
+        <a href="index.html">首页</a>
+        <a href="chinese.html">语文资料</a>
+        <a href="writing.html">作文素材</a>
+        <a href="pages/writing-cards-week20.html">素材卡片墙</a>
+        <a href="beike.html">备课资源</a>
+        <a class="active" href="search.html">搜索</a>
+        <a href="about.html">关于</a>
+      </div>
+    </nav>
+  </header>
+
   <main>
-    <section class="page-hero"><div class="breadcrumb"><a href="index.html">首页</a> / 搜索资料</div><p class="eyebrow">站内搜索 · 快速定位 · 纯静态索引</p><h1>搜索资料</h1><p>输入关键词即可搜索资料标题、所属栏目、简介与标签。示例：作文、文言实词、苏轼、默写易错、议论文、名著人物、小说阅读、诗歌意象。</p></section>
+    <section class="page-hero">
+      <div class="breadcrumb"><a href="index.html">首页</a> / 搜索</div>
+      <p class="eyebrow">站内搜索 · 快速定位 · 资料索引</p>
+      <h1>搜索</h1>
+      <p>输入关键词即可搜索资料标题、所属栏目、简介与标签。示例：作文、文言实词、苏轼、默写易错、议论文、名著人物、小说阅读、诗歌意象。</p>
+    </section>
+
     <section class="search-panel">
       <form class="search-box" id="searchForm">
         <input id="searchInput" type="search" placeholder="输入关键词，如：苏轼、文言实词、小说阅读" aria-label="搜索关键词">
@@ -20,7 +43,14 @@
       <div class="search-results" id="searchResults"></div>
     </section>
   </main>
-  <footer class="site-footer"><div class="footer-inner"><div><h2>教师简介</h2><p>高中一线语文教师，持续整理清爽好用的语文学习资料。</p></div><div><h2>教学寄语</h2><p>查找资料不是终点，真正重要的是把资料转化为自己的理解。</p></div></div></footer>
+
+  <footer class="site-footer">
+    <div class="footer-inner">
+      <div><h2>教师简介</h2><p>高中一线语文教师，持续整理清爽好用的语文学习资料。</p></div>
+      <div><h2>教学寄语</h2><p>查找资料不是终点，真正重要的是把资料转化为自己的理解。</p></div>
+    </div>
+  </footer>
+
   <script src="data/search-index-data.js"></script>
   <script src="js/search.js"></script>
   <script src="js/reader-tools.js"></script>
