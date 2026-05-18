@@ -4,6 +4,7 @@ import ArticleForm, { type ArticleFormValues } from "../../ArticleForm";
 import { updateArticleAction } from "../../actions";
 import { createClient } from "../../../../../lib/supabase/server";
 
+import AdminNav from "../../../AdminNav";
 type EditArticlePageProps = {
   params: {
     id: string;
@@ -16,6 +17,7 @@ export default async function EditArticlePage({ params }: EditArticlePageProps) 
   if (!supabase) {
     return (
       <main className="admin-shell">
+        <AdminNav />
         <section className="admin-card">
           <p className="muted">Admin / Articles / Edit</p>
           <h1>编辑文章</h1>
@@ -42,6 +44,7 @@ export default async function EditArticlePage({ params }: EditArticlePageProps) 
 
   return (
     <main className="admin-shell">
+      <AdminNav />
       <section className="admin-card">
         <p className="muted">Admin / Articles / Edit</p>
         <h1>编辑文章</h1>
