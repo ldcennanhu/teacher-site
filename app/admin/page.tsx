@@ -1,9 +1,87 @@
 import Link from "next/link";
 import { createClient } from "../../lib/supabase/server";
 
+type AdminStats = {
+  articleTotal: number;
+  publishedArticles: number;
+  draftArticles: number;
+  materialTotal: number;
+  teachingFileTotal: number;
+};
+
+const emptyStats: AdminStats = {
+  articleTotal: 0,
+  publishedArticles: 0,
+  draftArticles: 0,
+  materialTotal: 0,
+  teachingFileTotal: 0
+};
+
+type SupabaseClient = NonNullable<ReturnType<typeof createClient>>;
+
+async function countUserRows(
+  supabase: SupabaseClient,
+  table: "articles" | "materials" | "teaching_files",
+  userId: string,
+  status?: "published" | "draft"
+) {
+  try {
+    let query = supabase
+      .from(table)
+      .select("id", { count: "exact", head: true })
+      .eq("author_id", userId);
+
+    if (status) {
+      query = query.eq("status", status);
+    }
+
+    const { count, error } = await query;
+
+    if (error) {
+      return 0;
+    }
+
+    return count ?? 0;
+  } catch {
+    return 0;
+  }
+}
+
+async function getAdminStats(supabase: SupabaseClient | null, userId?: string) {
+  if (!supabase || !userId) {
+    return emptyStats;
+  }
+
+  const [articleTotal, publishedArticles, draftArticles, materialTotal, teachingFileTotal] =
+    await Promise.all([
+      countUserRows(supabase, "articles", userId),
+      countUserRows(supabase, "articles", userId, "published"),
+      countUserRows(supabase, "articles", userId, "draft"),
+      countUserRows(supabase, "materials", userId),
+      countUserRows(supabase, "teaching_files", userId)
+    ]);
+
+  return {
+    articleTotal,
+    publishedArticles,
+    draftArticles,
+    materialTotal,
+    teachingFileTotal
+  };
+}
+
 export default async function AdminHomePage() {
   const supabase = createClient();
   const { data } = supabase ? await supabase.auth.getUser() : { data: { user: null } };
+  const stats = await getAdminStats(supabase, data.user?.id);
+
+  const statCards = [
+    { label: "文章总数", value: stats.articleTotal },
+    { label: "已发布文章数", value: stats.publishedArticles },
+    { label: "草稿文章数", value: stats.draftArticles },
+    { label: "素材卡片数", value: stats.materialTotal },
+    { label: "备课文件数", value: stats.teachingFileTotal }
+  ];
 
   return (
     <main className="admin-shell">
@@ -16,6 +94,15 @@ export default async function AdminHomePage() {
             ? `当前登录：${data.user.email ?? data.user.id}`
             : "Supabase 环境变量配置后即可启用登录保护。"}
         </p>
+
+        <div className="admin-stats" aria-label="后台数据统计">
+          {statCards.map((stat) => (
+            <article className="admin-stat-card" key={stat.label}>
+              <strong className="admin-stat-number">{stat.value}</strong>
+              <span className="admin-stat-label">{stat.label}</span>
+            </article>
+          ))}
+        </div>
 
         <div className="admin-grid">
           <article className="admin-card">
