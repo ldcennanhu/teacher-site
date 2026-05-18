@@ -13,6 +13,8 @@ type MaterialRow = {
   quotes: string[] | null;
   topics: string[] | null;
   expand: string | null;
+  year: number | null;
+  week: number | null;
   updated_at: string | null;
   published_at: string | null;
 };
@@ -34,26 +36,52 @@ function normalizeMaterial(material: MaterialRow) {
     quotes: normalizeStringList(material.quotes),
     topics: normalizeStringList(material.topics),
     expand: material.expand ?? "",
+    year: material.year,
+    week: material.week,
     updated_at: material.updated_at,
     published_at: material.published_at
   };
 }
 
-export async function GET() {
+function parseNumberParam(value: string | null) {
+  if (!value || !/^\d+$/.test(value)) {
+    return null;
+  }
+
+  const parsed = Number(value);
+  return Number.isSafeInteger(parsed) ? parsed : null;
+}
+
+export async function GET(request: Request) {
   const supabase = createClient();
 
   if (!supabase) {
     return NextResponse.json([]);
   }
 
+  const { searchParams } = new URL(request.url);
+  const year = parseNumberParam(searchParams.get("year"));
+  const week = parseNumberParam(searchParams.get("week"));
+
   try {
-    const { data, error } = await supabase
+    let query = supabase
+      .schema("public")
       .from("materials")
       .select(
-        "id,title,topic,summary,tags,points,main_quote,life,quotes,topics,expand,updated_at,published_at"
+        "id,title,topic,summary,tags,points,main_quote,life,quotes,topics,expand,year,week,updated_at,published_at"
       )
       .eq("status", "published")
-      .eq("visibility", "public")
+      .eq("visibility", "public");
+
+    if (year !== null) {
+      query = query.eq("year", year);
+    }
+
+    if (week !== null) {
+      query = query.eq("week", week);
+    }
+
+    const { data, error } = await query
       .order("is_pinned", { ascending: false })
       .order("updated_at", { ascending: false });
 
