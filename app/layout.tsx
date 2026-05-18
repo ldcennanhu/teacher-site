@@ -33,6 +33,12 @@ const globalStyles = `
   label { display: grid; gap: 8px; font-weight: 700; }
   form { display: grid; gap: 16px; }
   .muted { color: #667085; }
+
+  .admin-stats { display: grid; gap: 14px; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); margin: 24px 0; }
+  .admin-stat-card { display: grid; gap: 8px; border: 1px solid #eadccb; border-radius: 16px; padding: 18px; background: #fffaf2; }
+  .admin-stat-number { color: #8b4f39; font-size: 32px; line-height: 1; font-weight: 800; }
+  .admin-stat-label { color: #667085; font-size: 14px; font-weight: 700; }
+
   .article-detail-shell { max-width: 920px; margin: 0 auto; padding: 56px 20px 96px; }
   .article-detail-card { background: #fffaf2; border: 1px solid #eadccb; border-radius: 22px; padding: 42px; box-shadow: 0 22px 60px rgb(67 48 33 / 9%); }
   .article-breadcrumb { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 28px; color: #667085; font-size: 15px; }
