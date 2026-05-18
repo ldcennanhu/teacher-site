@@ -1,4 +1,5 @@
 import Link from "next/link";
+import LogoutButton from "./LogoutButton";
 import { requireAdminUser } from "../../lib/admin/auth";
 import { createClient } from "../../lib/supabase/server";
 
@@ -90,6 +91,10 @@ export default async function AdminHomePage() {
         <h1>内容管理后台</h1>
 
         <p className="muted">当前登录：{user.email ?? user.id}</p>
+
+        <div className="admin-actions">
+          <LogoutButton />
+        </div>
 
         <div className="admin-stats" aria-label="后台数据统计">
           {statCards.map((stat) => (
