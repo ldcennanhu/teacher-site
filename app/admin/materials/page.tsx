@@ -1,7 +1,8 @@
 import Link from "next/link";
+import { createClient } from "../../../lib/supabase/server";
 import DeleteMaterialButton from "./DeleteMaterialButton";
-import { requireAdminUser } from "../../../lib/admin/auth";
 
+import AdminNav from "../AdminNav";
 type Material = {
   id: string;
   title: string | null;
@@ -24,27 +25,39 @@ function formatDate(value: string | null) {
 }
 
 export default async function AdminMaterialsPage() {
-  const { supabase, user } = await requireAdminUser();
+  const supabase = createClient();
   let materials: Material[] = [];
-  let message = "配置 Supabase 后会从 materials 表读取当前账号的素材卡片。";
+  let message = "配置 Supabase 后会从 materials 表读取当前登录用户的素材卡片。";
 
-  const { data, error } = await supabase
-    .from("materials")
-    .select("id,title,topic,status,visibility,is_pinned,updated_at")
-    .eq("author_id", user.id)
-    .order("updated_at", { ascending: false });
+  if (supabase) {
+    const {
+      data: { user },
+      error: userError
+    } = await supabase.auth.getUser();
 
-  if (error) {
-    message = error.message;
-  } else {
-    materials = data ?? [];
-    message = materials.length
-      ? "按更新时间倒序显示当前账号创建的素材卡片。"
-      : "暂无素材卡片，请先新建。";
+    if (userError || !user) {
+      message = userError?.message ?? "请先登录后再管理素材卡片。";
+    } else {
+      const { data, error } = await supabase
+        .from("materials")
+        .select("id,title,topic,status,visibility,is_pinned,updated_at")
+        .eq("author_id", user.id)
+        .order("updated_at", { ascending: false });
+
+      if (error) {
+        message = error.message;
+      } else {
+        materials = data ?? [];
+        message = materials.length
+          ? "按更新时间倒序显示当前登录用户创建的素材卡片。"
+          : "暂无素材卡片，请先新建。";
+      }
+    }
   }
 
   return (
     <main className="admin-shell">
+      <AdminNav />
       <section className="admin-card">
         <div className="admin-heading-row">
           <div>
