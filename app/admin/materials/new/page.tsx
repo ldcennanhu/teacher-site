@@ -1,5 +1,6 @@
 import MaterialForm from "../MaterialForm";
 import { createMaterialAction } from "../actions";
+import AdminNav from "../../AdminNav";
 import { requireAdminUser } from "../../../../lib/admin/auth";
 
 export default async function NewMaterialPage() {
@@ -7,6 +8,8 @@ export default async function NewMaterialPage() {
 
   return (
     <main className="admin-shell">
+      <AdminNav />
+
       <section className="admin-card">
         <p className="muted">Admin / Materials / New</p>
         <h1>新建素材卡片</h1>
