@@ -1,10 +1,10 @@
 import Link from "next/link";
-import { requireAdminUser } from "../../../lib/admin/auth";
+import { createClient } from "../../../lib/supabase/server";
+import DeleteRecommendationButton from "./DeleteRecommendationButton";
 
 type Recommendation = {
   id: string;
   title: string | null;
-  category: string | null;
   status: string | null;
   sort_order: number | null;
   updated_at: string | null;
@@ -22,24 +22,35 @@ function formatDate(value: string | null) {
 }
 
 export default async function AdminRecommendationsPage() {
-  const { supabase, user } = await requireAdminUser();
+  const supabase = createClient();
   let recommendations: Recommendation[] = [];
-  let message = "配置 Supabase 后会从 recommendations 表读取当前账号的推荐内容。";
+  let message = "配置 Supabase 后会从 home_recommendations 表读取当前登录用户的首页推荐。";
 
-  const { data, error } = await supabase
-    .from("recommendations")
-    .select("id,title,category,status,sort_order,updated_at")
-    .eq("author_id", user.id)
-    .order("sort_order", { ascending: true })
-    .order("updated_at", { ascending: false });
+  if (supabase) {
+    const {
+      data: { user },
+      error: userError
+    } = await supabase.auth.getUser();
 
-  if (error) {
-    message = error.message;
-  } else {
-    recommendations = data ?? [];
-    message = recommendations.length
-      ? "按排序值和更新时间显示当前账号创建的推荐内容。"
-      : "暂无推荐内容，请先新建。";
+    if (userError || !user) {
+      message = userError?.message ?? "请先登录后再管理首页推荐。";
+    } else {
+      const { data, error } = await supabase
+        .from("home_recommendations")
+        .select("id,title,status,sort_order,updated_at")
+        .eq("author_id", user.id)
+        .order("sort_order", { ascending: true })
+        .order("updated_at", { ascending: false });
+
+      if (error) {
+        message = error.message;
+      } else {
+        recommendations = data ?? [];
+        message = recommendations.length
+          ? "按排序值和更新时间显示当前登录用户创建的首页推荐。"
+          : "暂无首页推荐，请先新建。";
+      }
+    }
   }
 
   return (
@@ -48,7 +59,7 @@ export default async function AdminRecommendationsPage() {
         <div className="admin-heading-row">
           <div>
             <p className="muted">Admin / Recommendations</p>
-            <h1>推荐内容管理</h1>
+            <h1>首页推荐管理</h1>
           </div>
 
           <Link className="admin-button" href="/admin/recommendations/new">
@@ -64,20 +75,30 @@ export default async function AdminRecommendationsPage() {
               <thead>
                 <tr>
                   <th>标题 title</th>
-                  <th>分类 category</th>
                   <th>状态 status</th>
                   <th>排序 sort_order</th>
                   <th>更新时间 updated_at</th>
+                  <th>操作</th>
                 </tr>
               </thead>
               <tbody>
                 {recommendations.map((recommendation) => (
                   <tr key={recommendation.id}>
                     <td>{recommendation.title ?? "未命名"}</td>
-                    <td>{recommendation.category ?? "-"}</td>
                     <td>{recommendation.status ?? "draft"}</td>
                     <td>{recommendation.sort_order ?? 0}</td>
                     <td>{formatDate(recommendation.updated_at)}</td>
+                    <td>
+                      <div className="admin-actions">
+                        <Link
+                          className="admin-link-button"
+                          href={`/admin/recommendations/${recommendation.id}/edit`}
+                        >
+                          编辑
+                        </Link>
+                        <DeleteRecommendationButton id={recommendation.id} />
+                      </div>
+                    </td>
                   </tr>
                 ))}
               </tbody>
