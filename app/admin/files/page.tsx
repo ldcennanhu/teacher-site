@@ -1,7 +1,6 @@
 import Link from "next/link";
 import DeleteFileButton from "./DeleteFileButton";
-import { redirect } from "next/navigation";
-import { createClient } from "../../../lib/supabase/server";
+import { requireAdminUser } from "../../../lib/admin/auth";
 
 type TeachingFile = {
   id: string;
@@ -26,28 +25,7 @@ function formatDate(value: string | null) {
 }
 
 export default async function AdminFilesPage() {
-  const supabase = createClient();
-
-  if (!supabase) {
-    return (
-      <main className="admin-shell">
-        <section className="admin-card">
-          <p className="muted">Admin / Files</p>
-          <h1>备课文件</h1>
-          <p>缺少 NEXT_PUBLIC_SUPABASE_URL 或 NEXT_PUBLIC_SUPABASE_ANON_KEY 环境变量。</p>
-        </section>
-      </main>
-    );
-  }
-
-  const {
-    data: { user },
-    error: userError
-  } = await supabase.auth.getUser();
-
-  if (userError || !user) {
-    redirect("/admin/login");
-  }
+  const { supabase, user } = await requireAdminUser();
 
   const { data, error } = await supabase
     .from("teaching_files")
@@ -56,7 +34,11 @@ export default async function AdminFilesPage() {
     .order("updated_at", { ascending: false });
 
   const files = (data ?? []) as TeachingFile[];
-  const message = error ? error.message : files.length ? "按更新时间倒序显示当前账号上传的备课文件。" : "暂无备课文件，请先上传";
+  const message = error
+    ? error.message
+    : files.length
+      ? "按更新时间倒序显示当前账号上传的备课文件。"
+      : "暂无备课文件，请先上传";
 
   return (
     <main className="admin-shell">
