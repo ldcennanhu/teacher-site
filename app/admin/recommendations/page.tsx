@@ -1,14 +1,12 @@
 import Link from "next/link";
-import { redirect } from "next/navigation";
-import { createClient } from "../../../lib/supabase/server";
+import { requireAdminUser } from "../../../lib/admin/auth";
 
-type HomeRecommendation = {
+type Recommendation = {
   id: string;
   title: string | null;
-  slot: string | null;
+  category: string | null;
   status: string | null;
-  visibility: string | null;
-  is_pinned: boolean | null;
+  sort_order: number | null;
   updated_at: string | null;
 };
 
@@ -24,42 +22,25 @@ function formatDate(value: string | null) {
 }
 
 export default async function AdminRecommendationsPage() {
-  const supabase = createClient();
-
-  if (!supabase) {
-    return (
-      <main className="admin-shell">
-        <section className="admin-card">
-          <p className="muted">Admin / Recommendations</p>
-          <h1>首页推荐</h1>
-          <p>缺少 NEXT_PUBLIC_SUPABASE_URL 或 NEXT_PUBLIC_SUPABASE_ANON_KEY 环境变量。</p>
-        </section>
-      </main>
-    );
-  }
-
-  const {
-    data: { user },
-    error: userError
-  } = await supabase.auth.getUser();
-
-  if (userError || !user) {
-    redirect("/admin/login");
-  }
+  const { supabase, user } = await requireAdminUser();
+  let recommendations: Recommendation[] = [];
+  let message = "配置 Supabase 后会从 recommendations 表读取当前账号的推荐内容。";
 
   const { data, error } = await supabase
-    .from("home_recommendations")
-    .select("id,title,slot,status,visibility,is_pinned,updated_at")
+    .from("recommendations")
+    .select("id,title,category,status,sort_order,updated_at")
     .eq("author_id", user.id)
-    .order("is_pinned", { ascending: false })
+    .order("sort_order", { ascending: true })
     .order("updated_at", { ascending: false });
 
-  const recommendations = (data ?? []) as HomeRecommendation[];
-  const message = error
-    ? error.message
-    : recommendations.length
-      ? "按置顶和更新时间显示当前账号创建的首页推荐。"
-      : "暂无首页推荐，请先新建";
+  if (error) {
+    message = error.message;
+  } else {
+    recommendations = data ?? [];
+    message = recommendations.length
+      ? "按排序值和更新时间显示当前账号创建的推荐内容。"
+      : "暂无推荐内容，请先新建。";
+  }
 
   return (
     <main className="admin-shell">
@@ -67,8 +48,9 @@ export default async function AdminRecommendationsPage() {
         <div className="admin-heading-row">
           <div>
             <p className="muted">Admin / Recommendations</p>
-            <h1>首页推荐</h1>
+            <h1>推荐内容管理</h1>
           </div>
+
           <Link className="admin-button" href="/admin/recommendations/new">
             新建推荐
           </Link>
@@ -82,33 +64,20 @@ export default async function AdminRecommendationsPage() {
               <thead>
                 <tr>
                   <th>标题 title</th>
-                  <th>推荐位置 slot</th>
+                  <th>分类 category</th>
                   <th>状态 status</th>
-                  <th>可见性 visibility</th>
-                  <th>置顶 is_pinned</th>
+                  <th>排序 sort_order</th>
                   <th>更新时间 updated_at</th>
-                  <th>操作</th>
                 </tr>
               </thead>
               <tbody>
                 {recommendations.map((recommendation) => (
                   <tr key={recommendation.id}>
                     <td>{recommendation.title ?? "未命名"}</td>
-                    <td>{recommendation.slot ?? "-"}</td>
+                    <td>{recommendation.category ?? "-"}</td>
                     <td>{recommendation.status ?? "draft"}</td>
-                    <td>{recommendation.visibility ?? "private"}</td>
-                    <td>{recommendation.is_pinned ? "是" : "否"}</td>
+                    <td>{recommendation.sort_order ?? 0}</td>
                     <td>{formatDate(recommendation.updated_at)}</td>
-                    <td>
-                      <div className="admin-actions">
-                        <Link
-                          className="admin-link-button"
-                          href={`/admin/recommendations/${recommendation.id}/edit`}
-                        >
-                          编辑
-                        </Link>
-                      </div>
-                    </td>
                   </tr>
                 ))}
               </tbody>
