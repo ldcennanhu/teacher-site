@@ -109,9 +109,29 @@
       link.addEventListener("click", (event) => {
         event.preventDefault();
 
-        activeCategory = link.getAttribute("data-auto-category") || "全部";
-        renderSideNav(currentArticles);
-        renderArticleList(currentArticles);
+        const nextCategory = link.getAttribute("data-auto-category") || "全部";
+        if (nextCategory === activeCategory) {
+          articleList.scrollIntoView({ behavior: "smooth", block: "start" });
+          return;
+        }
+
+        activeCategory = nextCategory;
+
+        articleList.style.transition = "opacity 180ms ease, transform 180ms ease";
+        articleList.style.opacity = "0.25";
+        articleList.style.transform = "translateY(8px)";
+
+        window.setTimeout(() => {
+          renderSideNav(currentArticles);
+          renderArticleList(currentArticles);
+
+          articleList.scrollIntoView({ behavior: "smooth", block: "start" });
+
+          window.requestAnimationFrame(() => {
+            articleList.style.opacity = "1";
+            articleList.style.transform = "translateY(0)";
+          });
+        }, 140);
       });
     });
   }
