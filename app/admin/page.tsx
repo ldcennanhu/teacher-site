@@ -20,15 +20,15 @@ export default async function AdminHomePage() {
         <div className="admin-grid">
           <article className="admin-card">
             <h2>文章管理</h2>
-            <p>查看后续接入 Supabase 的文章数据入口。</p>
+            <p>新建、编辑、发布教学文章，内容可同步到栏目页、首页最新更新和搜索页。</p>
             <Link className="admin-button" href="/admin/articles">
               进入文章
             </Link>
           </article>
 
           <article className="admin-card">
-            <h2>素材卡片墙</h2>
-            <p>新建、编辑和删除当前登录用户自己的作文素材卡片。</p>
+            <h2>素材卡片</h2>
+            <p>管理每周作文素材卡、人物素材、主题素材和金句。</p>
             <Link className="admin-button" href="/admin/materials">
               进入素材
             </Link>
@@ -44,12 +44,16 @@ export default async function AdminHomePage() {
 
           <article className="admin-card">
             <h2>站点预览</h2>
-            <p>保留原静态内容生成流程，便于继续发布教学资料。</p>
+            <p>查看正式前台页面，确认发布内容展示效果。</p>
             <a className="admin-button" href="/index.html">
               打开首页
             </a>
           </article>
         </div>
+
+        <p className="admin-warning">
+          发布前请确认：不包含学生姓名、成绩、排名、联系方式、班级隐私或未授权版权内容。
+        </p>
       </section>
     </main>
   );
