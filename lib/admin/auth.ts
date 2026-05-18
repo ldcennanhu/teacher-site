@@ -1,24 +1,20 @@
-import type { User } from "@supabase/supabase-js";
+import { redirect } from "next/navigation";
 import { createClient } from "../supabase/server";
 
 export type AdminProfile = {
+  id: string;
   user_id: string;
-  email: string | null;
+  email: string;
   role: string | null;
   is_active: boolean | null;
 };
 
-export type AdminAuthState = {
-  user: User | null;
-  profile: AdminProfile | null;
-  isAdmin: boolean;
-};
-
-export async function getAdminAuth(): Promise<AdminAuthState> {
+export async function getAdminAuth() {
   const supabase = createClient();
 
   if (!supabase) {
     return {
+      supabase: null,
       user: null,
       profile: null,
       isAdmin: false
@@ -32,6 +28,7 @@ export async function getAdminAuth(): Promise<AdminAuthState> {
 
   if (userError || !user) {
     return {
+      supabase,
       user: null,
       profile: null,
       isAdmin: false
@@ -40,14 +37,42 @@ export async function getAdminAuth(): Promise<AdminAuthState> {
 
   const { data: profile, error: profileError } = await supabase
     .from("admin_profiles")
-    .select("user_id,email,role,is_active")
+    .select("id,user_id,email,role,is_active")
     .eq("user_id", user.id)
     .eq("is_active", true)
     .maybeSingle<AdminProfile>();
 
+  if (profileError || !profile) {
+    return {
+      supabase,
+      user,
+      profile: null,
+      isAdmin: false
+    };
+  }
+
   return {
+    supabase,
     user,
-    profile: profileError ? null : profile,
-    isAdmin: Boolean(!profileError && profile?.is_active)
+    profile,
+    isAdmin: true
+  };
+}
+
+export async function requireAdminUser() {
+  const auth = await getAdminAuth();
+
+  if (!auth.user) {
+    redirect("/admin/login");
+  }
+
+  if (!auth.isAdmin) {
+    redirect("/admin/unauthorized");
+  }
+
+  return {
+    supabase: auth.supabase,
+    user: auth.user,
+    profile: auth.profile
   };
 }
