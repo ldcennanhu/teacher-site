@@ -14,6 +14,291 @@
     "beike"
   ]);
 
+  const standardCategories = {
+    zuowen: [
+      "人物素材",
+      "万能金句",
+      "思辨议论文",
+      "考场范文",
+      "写作技巧",
+      "开头结尾模板",
+      "热点主题",
+      "审题立意"
+    ],
+    wenyan: [
+      "实词积累",
+      "虚词大全",
+      "通假字",
+      "特殊句式",
+      "课内精讲",
+      "翻译口诀",
+      "断句训练",
+      "文化常识"
+    ],
+    shici: [
+      "必背默写",
+      "意象意境",
+      "情感主旨",
+      "表达技巧",
+      "诗歌题型",
+      "名句积累",
+      "课内精讲",
+      "鉴赏模板"
+    ],
+    yuedu: [
+      "论述类文本",
+      "文学类文本",
+      "实用类文本",
+      "散文阅读",
+      "小说阅读",
+      "信息类文本",
+      "答题模板",
+      "真题训练"
+    ],
+    mingzhu: [
+      "人物形象",
+      "情节梳理",
+      "主题思想",
+      "艺术特色",
+      "高频考点",
+      "简答训练",
+      "整本书阅读",
+      "名著比较"
+    ],
+    beike: [
+      "课堂课件",
+      "教案文稿",
+      "课堂学案",
+      "练习题",
+      "答案解析",
+      "月考讲评",
+      "知识点汇总",
+      "公开下载"
+    ]
+  };
+
+  const categoryAliases = {
+    zuowen: {
+      "人物": "人物素材",
+      "人物素材": "人物素材",
+      "名人素材": "人物素材",
+      "作文人物": "人物素材",
+      "人物事例": "人物素材",
+
+      "金句": "万能金句",
+      "万能金句": "万能金句",
+      "作文金句": "万能金句",
+      "名言金句": "万能金句",
+
+      "思辨": "思辨议论文",
+      "思辨作文": "思辨议论文",
+      "思辨议论文": "思辨议论文",
+      "议论文": "思辨议论文",
+
+      "范文": "考场范文",
+      "考场范文": "考场范文",
+      "优秀作文": "考场范文",
+      "高分作文": "考场范文",
+
+      "技巧": "写作技巧",
+      "写作技巧": "写作技巧",
+      "作文技巧": "写作技巧",
+      "写法指导": "写作技巧",
+
+      "开头": "开头结尾模板",
+      "结尾": "开头结尾模板",
+      "开头结尾": "开头结尾模板",
+      "开头结尾模板": "开头结尾模板",
+      "作文模板": "开头结尾模板",
+
+      "热点": "热点主题",
+      "热点主题": "热点主题",
+      "时事热点": "热点主题",
+      "时代主题": "热点主题",
+
+      "审题": "审题立意",
+      "立意": "审题立意",
+      "审题立意": "审题立意"
+    },
+
+    wenyan: {
+      "实词": "实词积累",
+      "文言实词": "实词积累",
+      "高频实词": "实词积累",
+      "实词积累": "实词积累",
+
+      "虚词": "虚词大全",
+      "文言虚词": "虚词大全",
+      "高频虚词": "虚词大全",
+      "虚词大全": "虚词大全",
+
+      "通假": "通假字",
+      "通假字": "通假字",
+      "通假整理": "通假字",
+
+      "句式": "特殊句式",
+      "文言句式": "特殊句式",
+      "特殊句式": "特殊句式",
+      "判断句": "特殊句式",
+      "被动句": "特殊句式",
+      "倒装句": "特殊句式",
+
+      "课内": "课内精讲",
+      "课内文言": "课内精讲",
+      "课内精讲": "课内精讲",
+      "课文精讲": "课内精讲",
+
+      "翻译": "翻译口诀",
+      "翻译方法": "翻译口诀",
+      "文言翻译": "翻译口诀",
+      "翻译口诀": "翻译口诀",
+
+      "断句": "断句训练",
+      "文言断句": "断句训练",
+      "断句训练": "断句训练",
+
+      "文化常识": "文化常识",
+      "古代文化常识": "文化常识",
+      "文学常识": "文化常识"
+    },
+
+    shici: {
+      "默写": "必背默写",
+      "必背": "必背默写",
+      "必背默写": "必背默写",
+      "古诗文默写": "必背默写",
+
+      "意象": "意象意境",
+      "意境": "意象意境",
+      "意象意境": "意象意境",
+
+      "情感": "情感主旨",
+      "主旨": "情感主旨",
+      "情感主旨": "情感主旨",
+      "思想感情": "情感主旨",
+
+      "技巧": "表达技巧",
+      "手法": "表达技巧",
+      "表达技巧": "表达技巧",
+      "艺术手法": "表达技巧",
+
+      "题型": "诗歌题型",
+      "诗歌题型": "诗歌题型",
+      "诗词题型": "诗歌题型",
+
+      "名句": "名句积累",
+      "名句积累": "名句积累",
+      "诗词名句": "名句积累",
+
+      "课内": "课内精讲",
+      "课内诗词": "课内精讲",
+      "课内精讲": "课内精讲",
+
+      "鉴赏": "鉴赏模板",
+      "诗歌鉴赏": "鉴赏模板",
+      "鉴赏模板": "鉴赏模板"
+    },
+
+    yuedu: {
+      "论述类": "论述类文本",
+      "论述类文本": "论述类文本",
+      "论说文": "论述类文本",
+
+      "文学类": "文学类文本",
+      "文学类文本": "文学类文本",
+
+      "实用类": "实用类文本",
+      "实用类文本": "实用类文本",
+
+      "散文": "散文阅读",
+      "散文阅读": "散文阅读",
+
+      "小说": "小说阅读",
+      "小说阅读": "小说阅读",
+
+      "信息类": "信息类文本",
+      "信息类文本": "信息类文本",
+      "非连续性文本": "信息类文本",
+
+      "模板": "答题模板",
+      "答题模板": "答题模板",
+      "阅读模板": "答题模板",
+      "答题技巧": "答题模板",
+
+      "真题": "真题训练",
+      "真题训练": "真题训练",
+      "阅读真题": "真题训练"
+    },
+
+    mingzhu: {
+      "人物": "人物形象",
+      "人物形象": "人物形象",
+      "人物分析": "人物形象",
+
+      "情节": "情节梳理",
+      "情节梳理": "情节梳理",
+      "情节概括": "情节梳理",
+
+      "主题": "主题思想",
+      "主题思想": "主题思想",
+      "思想主题": "主题思想",
+
+      "艺术": "艺术特色",
+      "艺术特色": "艺术特色",
+      "写作特色": "艺术特色",
+
+      "考点": "高频考点",
+      "高频考点": "高频考点",
+      "名著考点": "高频考点",
+
+      "简答": "简答训练",
+      "简答训练": "简答训练",
+      "简答题": "简答训练",
+
+      "整本书": "整本书阅读",
+      "整本书阅读": "整本书阅读",
+
+      "比较": "名著比较",
+      "名著比较": "名著比较",
+      "比较阅读": "名著比较"
+    },
+
+    beike: {
+      "课件": "课堂课件",
+      "课堂课件": "课堂课件",
+      "PPT": "课堂课件",
+      "ppt": "课堂课件",
+
+      "教案": "教案文稿",
+      "教案文稿": "教案文稿",
+      "教学设计": "教案文稿",
+
+      "学案": "课堂学案",
+      "课堂学案": "课堂学案",
+      "导学案": "课堂学案",
+
+      "练习": "练习题",
+      "练习题": "练习题",
+      "训练题": "练习题",
+
+      "答案": "答案解析",
+      "答案解析": "答案解析",
+      "解析": "答案解析",
+
+      "月考": "月考讲评",
+      "月考讲评": "月考讲评",
+      "试卷讲评": "月考讲评",
+
+      "知识点": "知识点汇总",
+      "知识点汇总": "知识点汇总",
+      "基础知识": "知识点汇总",
+
+      "公开": "公开下载",
+      "公开下载": "公开下载",
+      "学生下载": "公开下载"
+    }
+  };
+
   let currentArticles = [];
   let activeCategory = "全部";
 
@@ -43,8 +328,12 @@
     return [...items].sort((a, b) => String(b.date || "").localeCompare(String(a.date || "")));
   }
 
-  function normalizeCategory(category) {
-    return String(category || "").trim() || "未分类";
+  function normalizeCategory(category, section) {
+    const raw = String(category || "").trim();
+    if (!raw) return "未分类";
+
+    const aliases = categoryAliases[section] || {};
+    return aliases[raw] || raw;
   }
 
   function currentSection() {
@@ -56,12 +345,23 @@
     return sortByDate(articles.filter((article) => article.section === section));
   }
 
+  function categoryOrder(section, categories) {
+    const standard = standardCategories[section] || [];
+    const standardSet = new Set(standard);
+
+    const standardPart = standard.filter((category) => categories.includes(category));
+    const extraPart = categories.filter((category) => !standardSet.has(category));
+
+    return [...standardPart, ...extraPart];
+  }
+
   function uniqueCategories(articles) {
+    const section = currentSection();
     const categories = [];
     const seen = new Set();
 
     articles.forEach((article) => {
-      const category = normalizeCategory(article.category);
+      const category = normalizeCategory(article.category, article.section || section);
 
       if (!seen.has(category)) {
         seen.add(category);
@@ -69,16 +369,17 @@
       }
     });
 
-    return categories;
+    return categoryOrder(section, categories);
   }
 
   function articleCard(article) {
     const tags = (article.tags || []).map((tag) => `<span>${escapeHtml(tag)}</span>`).join("");
+    const category = normalizeCategory(article.category, article.section);
 
     return `
       <article class="article-list-card">
         <div>
-          <span class="data-meta">${escapeHtml(normalizeCategory(article.category))}</span>
+          <span class="data-meta">${escapeHtml(category)}</span>
           <h3>${escapeHtml(article.title)}</h3>
           <p>${escapeHtml(article.summary)}</p>
           <div class="data-tags">${tags}</div>
@@ -142,7 +443,10 @@
     let filtered = sectionArticles(articles);
 
     if (activeCategory !== "全部") {
-      filtered = filtered.filter((article) => normalizeCategory(article.category) === activeCategory);
+      filtered = filtered.filter((article) => {
+        const category = normalizeCategory(article.category, article.section);
+        return category === activeCategory;
+      });
     }
 
     if (!filtered.length) {
@@ -165,7 +469,7 @@
 
     latestContainer.innerHTML = latest.map((article) => `
       <a class="latest-item" href="${escapeHtml(linkPath(article.url))}">
-        <span>${escapeHtml(normalizeCategory(article.category))}</span>
+        <span>${escapeHtml(normalizeCategory(article.category, article.section))}</span>
         <strong>${escapeHtml(article.title)}</strong>
         <time>${escapeHtml(article.date)}</time>
       </a>
