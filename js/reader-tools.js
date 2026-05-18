@@ -23,8 +23,57 @@
     localStorage.setItem(key, JSON.stringify(value));
   }
 
+  function normalizeStoredUrl(url) {
+    const raw = String(url || "").trim();
+
+    if (!raw || raw === "#") {
+      return "";
+    }
+
+    if (/^(https?:|mailto:)/.test(raw)) {
+      return raw;
+    }
+
+    return raw
+      .replace(/^\/+/, "")
+      .replace(/^(\.\.\/)+/, "")
+      .replace(/\.html(#.*)?$/, "$1");
+  }
+
+  function normalizeStoredItem(item) {
+    if (!item || typeof item !== "object") return null;
+
+    const url = normalizeStoredUrl(item.url);
+    if (!url) return null;
+
+    return {
+      title: item.title || "未命名文章",
+      column: item.column || "",
+      date: item.date || "",
+      url
+    };
+  }
+
+  function cleanStore(key) {
+    const seen = new Set();
+    const cleaned = [];
+
+    readStore(key).forEach((item) => {
+      const normalized = normalizeStoredItem(item);
+      if (!normalized || seen.has(normalized.url)) return;
+
+      seen.add(normalized.url);
+      cleaned.push(normalized);
+    });
+
+    writeStore(key, cleaned.slice(0, 20));
+    return cleaned;
+  }
+
   function currentUrl() {
-    return window.location.pathname.split("/").slice(-3).join("/");
+    return window.location.pathname
+      .replace(/^\/+/, "")
+      .replace(/\.html$/, "");
   }
 
   function createProgressBar() {
@@ -65,25 +114,29 @@
   function articleMeta() {
     const article = document.querySelector("[data-reader-article]");
     if (!article) return null;
+
     return {
       title: article.dataset.title || document.title.replace("｜孤登塔客语文馆", ""),
       column: article.dataset.column || "",
       date: article.dataset.date || "",
-      url: article.dataset.url || currentUrl()
+      url: normalizeStoredUrl(article.dataset.url || currentUrl())
     };
   }
 
   function saveRecent(meta) {
-    if (!meta) return;
-    const recent = readStore(recentKey).filter((item) => item.url !== meta.url);
-    recent.unshift(meta);
+    const normalized = normalizeStoredItem(meta);
+    if (!normalized) return;
+
+    const recent = cleanStore(recentKey).filter((item) => item.url !== normalized.url);
+    recent.unshift(normalized);
     writeStore(recentKey, recent.slice(0, 5));
   }
 
   function renderRecent() {
     const containers = document.querySelectorAll("[data-recent-articles]");
     if (!containers.length) return;
-    const recent = readStore(recentKey).slice(0, 5);
+
+    const recent = cleanStore(recentKey).slice(0, 5);
 
     containers.forEach((container) => {
       if (!recent.length) {
@@ -102,10 +155,16 @@
 
   function setupFavorite(meta) {
     const button = document.querySelector("[data-favorite-button]");
-    if (!button || !meta) return;
+    const normalizedMeta = normalizeStoredItem(meta);
+
+    if (!button || !normalizedMeta) return;
+
+    function favorites() {
+      return cleanStore(favoriteKey);
+    }
 
     function isFavorite() {
-      return readStore(favoriteKey).some((item) => item.url === meta.url);
+      return favorites().some((item) => item.url === normalizedMeta.url);
     }
 
     function updateButton() {
@@ -114,12 +173,17 @@
     }
 
     button.addEventListener("click", () => {
-      const favorites = readStore(favoriteKey);
+      const current = favorites();
+
       if (isFavorite()) {
-        writeStore(favoriteKey, favorites.filter((item) => item.url !== meta.url));
+        writeStore(favoriteKey, current.filter((item) => item.url !== normalizedMeta.url));
       } else {
-        writeStore(favoriteKey, [meta, ...favorites.filter((item) => item.url !== meta.url)]);
+        writeStore(favoriteKey, [
+          normalizedMeta,
+          ...current.filter((item) => item.url !== normalizedMeta.url)
+        ]);
       }
+
       updateButton();
     });
 
@@ -132,6 +196,7 @@
     if (!content || !toc) return;
 
     const headings = Array.from(content.querySelectorAll("h2, h3"));
+
     if (!headings.length) {
       toc.innerHTML = '<p class="empty-note">本文暂无目录。</p>';
       return;
@@ -150,6 +215,7 @@
 
     const toggle = toc.querySelector(".toc-toggle");
     const links = Array.from(toc.querySelectorAll("a"));
+
     toggle.addEventListener("click", () => toc.classList.toggle("open"));
     links.forEach((link) => link.addEventListener("click", () => toc.classList.remove("open")));
 
@@ -157,8 +223,12 @@
       const visible = entries
         .filter((entry) => entry.isIntersecting)
         .sort((a, b) => b.intersectionRatio - a.intersectionRatio)[0];
+
       if (!visible) return;
-      links.forEach((link) => link.classList.toggle("active", link.getAttribute("href") === `#${visible.target.id}`));
+
+      links.forEach((link) => {
+        link.classList.toggle("active", link.getAttribute("href") === `#${visible.target.id}`);
+      });
     }, { rootMargin: "-20% 0px -65% 0px", threshold: [0.1, 0.5, 1] });
 
     headings.forEach((heading) => observer.observe(heading));
@@ -169,7 +239,8 @@
     if (!list) return;
 
     function render() {
-      const favorites = readStore(favoriteKey);
+      const favorites = cleanStore(favoriteKey);
+
       if (!favorites.length) {
         list.innerHTML = '<p class="empty-note">暂时还没有收藏文章。打开任意文章页，点击“收藏本文”即可保存到这里。</p>';
         return;
@@ -191,7 +262,10 @@
 
       list.querySelectorAll("[data-remove-favorite]").forEach((button) => {
         button.addEventListener("click", () => {
-          writeStore(favoriteKey, readStore(favoriteKey).filter((item) => item.url !== button.dataset.removeFavorite));
+          writeStore(
+            favoriteKey,
+            cleanStore(favoriteKey).filter((item) => item.url !== button.dataset.removeFavorite)
+          );
           render();
         });
       });
@@ -201,6 +275,7 @@
   }
 
   const meta = articleMeta();
+
   createProgressBar();
   createBackTop();
   saveRecent(meta);
