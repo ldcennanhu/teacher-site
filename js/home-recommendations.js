@@ -14,6 +14,29 @@
     return "";
   }
 
+  function normalizeSlot(slot) {
+    const value = firstText(slot);
+
+    const aliases = {
+      hero: "home_hero",
+      home_hero: "home_hero",
+
+      quote: "home_quote",
+      home_quote: "home_quote",
+
+      feature: "home_featured",
+      home_featured: "home_featured",
+
+      home_latest: "home_latest",
+
+      writing: "writing",
+      reading: "reading",
+      teaching: "teaching"
+    };
+
+    return aliases[value] || value;
+  }
+
   function normalizeRecommendation(item) {
     return {
       id: firstText(item.id),
@@ -22,7 +45,7 @@
       description: firstText(item.description),
       linkText: firstText(item.linkText, item.link_text),
       linkUrl: firstText(item.linkUrl, item.link_url),
-      slot: firstText(item.slot),
+      slot: normalizeSlot(item.slot),
       updatedAt: firstText(item.updatedAt, item.updated_at),
       publishedAt: firstText(item.publishedAt, item.published_at)
     };
@@ -79,15 +102,23 @@
     target.replaceWith(replacement);
   }
 
-  function applyFeature(recommendation) {
+  function findColumnCardByHref(href) {
+    if (!href) return null;
+
+    const normalizedHref = href.replace(/^\//, "");
+
+    return Array.from(document.querySelectorAll(".column-card")).find((card) => {
+      const cardHref = card.getAttribute("href") || "";
+      return cardHref === href || cardHref === normalizedHref || `/${cardHref}` === href;
+    });
+  }
+
+  function applyColumnCard(recommendation, fallbackHref) {
     if (!recommendation) return;
 
-    const featureLink = recommendation.linkUrl
-      ? Array.from(document.querySelectorAll(".column-card")).find(
-          (card) => card.getAttribute("href") === recommendation.linkUrl
-        )
-      : null;
-    const target = featureLink || document.querySelector(".column-card");
+    const target =
+      findColumnCardByHref(recommendation.linkUrl) ||
+      findColumnCardByHref(fallbackHref);
 
     if (!target) return;
 
@@ -112,13 +143,69 @@
     }
   }
 
+  function applyFeatured(recommendation) {
+    if (!recommendation) return;
+
+    const target =
+      findColumnCardByHref(recommendation.linkUrl) ||
+      document.querySelector(".column-card");
+
+    if (!target) return;
+
+    const title = target.querySelector("h3");
+    const description = target.querySelector("p");
+    const enter = target.querySelector(".enter");
+
+    if (recommendation.title && title) {
+      title.textContent = recommendation.title;
+    }
+
+    if (recommendation.description && description) {
+      description.textContent = recommendation.description;
+    }
+
+    if (recommendation.linkText && enter) {
+      enter.textContent = recommendation.linkText;
+    }
+
+    if (recommendation.linkUrl) {
+      target.setAttribute("href", recommendation.linkUrl);
+    }
+  }
+
+  function applyLatest(recommendation) {
+    if (!recommendation) return;
+
+    const section = document.querySelector(".latest-updates");
+    if (!section) return;
+
+    const heading = section.querySelector(".section-heading h2");
+    const description = section.querySelector(".section-heading p");
+
+    if (recommendation.title && heading) {
+      heading.textContent = recommendation.title;
+    }
+
+    if (recommendation.description && description) {
+      description.textContent = recommendation.description;
+    }
+  }
+
   function applyRecommendations(items) {
-    const recommendations = asArray(items).map(normalizeRecommendation).filter((item) => item.id);
+    const recommendations = asArray(items)
+      .map(normalizeRecommendation)
+      .filter((item) => item.id);
+
     if (!recommendations.length) return;
 
-    applyHero(firstBySlot(recommendations, "hero"));
-    applyQuote(firstBySlot(recommendations, "quote"));
-    applyFeature(firstBySlot(recommendations, "feature"));
+    applyHero(firstBySlot(recommendations, "home_hero"));
+    applyQuote(firstBySlot(recommendations, "home_quote"));
+    applyFeatured(firstBySlot(recommendations, "home_featured"));
+    applyLatest(firstBySlot(recommendations, "home_latest"));
+
+    applyColumnCard(firstBySlot(recommendations, "writing"), "zuowen.html");
+    applyColumnCard(firstBySlot(recommendations, "reading"), "yuedu.html");
+    applyColumnCard(firstBySlot(recommendations, "teaching"), "beike.html");
   }
 
   async function loadHomeRecommendations() {
