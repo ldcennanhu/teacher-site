@@ -28,9 +28,9 @@ function parseList(value: string) {
 }
 
 function currentWeekNumber(date = new Date()) {
-  const start = new Date(Date.UTC(date.getUTCFullYear(), 0, 1));
-  const diff = Number(date) - Number(start);
-  return Math.max(1, Math.ceil((diff / 86400000 + start.getUTCDay() + 1) / 7));
+  const firstDay = new Date(date.getFullYear(), 0, 1);
+  const dayOffset = Math.floor((Number(date) - Number(firstDay)) / 86400000);
+  return Math.max(1, Math.ceil((dayOffset + firstDay.getDay() + 1) / 7));
 }
 
 function buildMaterialPayload(formData: FormData, userId?: string) {
@@ -41,26 +41,15 @@ function buildMaterialPayload(formData: FormData, userId?: string) {
     title: getString(formData, "title"),
     topic: getString(formData, "topic") || null,
     summary: getString(formData, "summary") || null,
-
-    person_name: getString(formData, "person_name") || null,
     year: getNumber(formData, "year", new Date().getFullYear()),
     week: getNumber(formData, "week", currentWeekNumber()),
-
     tags: parseList(getString(formData, "tags")),
-    themes: parseList(getString(formData, "themes")),
     points: parseList(getString(formData, "points")),
     quotes: parseList(getString(formData, "quotes")),
     topics: parseList(getString(formData, "topics")),
-
     main_quote: getString(formData, "main_quote") || null,
     life: getString(formData, "life") || null,
-    biography: getString(formData, "biography") || null,
-    core_idea: getString(formData, "core_idea") || null,
-    writing_angles: getString(formData, "writing_angles") || null,
-    related_materials: getString(formData, "related_materials") || null,
-    classroom_usage: getString(formData, "classroom_usage") || null,
     expand: getString(formData, "expand") || null,
-
     status,
     visibility: getString(formData, "visibility") || defaultVisibility,
     is_pinned: formData.get("is_pinned") === "on",
@@ -77,6 +66,22 @@ function buildMaterialPayload(formData: FormData, userId?: string) {
 function validateMaterialPayload(payload: Record<string, unknown>) {
   if (!payload.title) {
     return "请填写素材标题。";
+  }
+
+  if (!payload.topic) {
+    return "请填写卡片主题。";
+  }
+
+  if (!payload.summary) {
+    return "请填写素材概述。";
+  }
+
+  if (!payload.main_quote) {
+    return "请填写核心金句。";
+  }
+
+  if (!payload.life) {
+    return "请填写人物生平 / 素材详情。";
   }
 
   return null;
@@ -153,7 +158,12 @@ export async function updateMaterialAction(
     .from("materials")
     .select("id,author_id,published_at,status")
     .eq("id", id)
-    .single();
+    .single<{
+      id: string;
+      author_id: string | null;
+      published_at: string | null;
+      status: string | null;
+    }>();
 
   if (existingError || !existingMaterial) {
     return { message: existingError?.message ?? "找不到这张素材卡片。" };
@@ -213,7 +223,10 @@ export async function deleteMaterialAction(formData: FormData): Promise<void> {
     .from("materials")
     .select("id,author_id")
     .eq("id", id)
-    .single();
+    .single<{
+      id: string;
+      author_id: string | null;
+    }>();
 
   if (!existingMaterial || existingMaterial.author_id !== user.id) {
     return;
