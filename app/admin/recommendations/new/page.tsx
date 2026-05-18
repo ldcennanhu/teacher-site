@@ -1,38 +1,22 @@
-import { redirect } from "next/navigation";
-import RecommendationForm from "../RecommendationForm";
-import { createRecommendationAction } from "../actions";
-import { createClient } from "../../../../lib/supabase/server";
+import Link from "next/link";
+import { requireAdminUser } from "../../../../lib/admin/auth";
 
 export default async function NewRecommendationPage() {
-  const supabase = createClient();
-
-  if (!supabase) {
-    return (
-      <main className="admin-shell">
-        <section className="admin-card">
-          <p className="muted">Admin / Recommendations / New</p>
-          <h1>新建首页推荐</h1>
-          <p>缺少 NEXT_PUBLIC_SUPABASE_URL 或 NEXT_PUBLIC_SUPABASE_ANON_KEY 环境变量。</p>
-        </section>
-      </main>
-    );
-  }
-
-  const {
-    data: { user },
-    error
-  } = await supabase.auth.getUser();
-
-  if (error || !user) {
-    redirect("/admin/login");
-  }
+  await requireAdminUser();
 
   return (
     <main className="admin-shell">
       <section className="admin-card">
         <p className="muted">Admin / Recommendations / New</p>
-        <h1>新建首页推荐</h1>
-        <RecommendationForm action={createRecommendationAction} submitLabel="保存推荐" />
+        <h1>新建推荐内容</h1>
+        <p>
+          推荐内容表单尚未接入。当前页面已纳入后台管理员白名单保护，后续可以继续补充推荐内容的表单和
+          server action。
+        </p>
+
+        <Link className="admin-button admin-button-secondary" href="/admin/recommendations">
+          返回推荐内容
+        </Link>
       </section>
     </main>
   );
