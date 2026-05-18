@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { requireAdminUser } from "../../lib/admin/auth";
 import { createClient } from "../../lib/supabase/server";
 
 type AdminStats = {
@@ -71,9 +72,8 @@ async function getAdminStats(supabase: SupabaseClient | null, userId?: string) {
 }
 
 export default async function AdminHomePage() {
-  const supabase = createClient();
-  const { data } = supabase ? await supabase.auth.getUser() : { data: { user: null } };
-  const stats = await getAdminStats(supabase, data.user?.id);
+  const { supabase, user } = await requireAdminUser();
+  const stats = await getAdminStats(supabase, user.id);
 
   const statCards = [
     { label: "文章总数", value: stats.articleTotal },
@@ -89,11 +89,7 @@ export default async function AdminHomePage() {
         <p className="muted">孤登塔客语文馆</p>
         <h1>内容管理后台</h1>
 
-        <p className="muted">
-          {data.user
-            ? `当前登录：${data.user.email ?? data.user.id}`
-            : "Supabase 环境变量配置后即可启用登录保护。"}
-        </p>
+        <p className="muted">当前登录：{user.email ?? user.id}</p>
 
         <div className="admin-stats" aria-label="后台数据统计">
           {statCards.map((stat) => (
@@ -126,14 +122,6 @@ export default async function AdminHomePage() {
             <p>上传和管理 PPT、PDF、Word、学案、练习题等备课资料。</p>
             <Link className="admin-button" href="/admin/files">
               进入文件
-            </Link>
-          </article>
-
-          <article className="admin-card">
-            <h2>首页推荐</h2>
-            <p>管理首页重点推荐内容、金句、入口按钮和展示文案。</p>
-            <Link className="admin-button" href="/admin/recommendations">
-              进入推荐
             </Link>
           </article>
 
