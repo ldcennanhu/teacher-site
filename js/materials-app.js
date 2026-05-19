@@ -92,7 +92,7 @@
     const weekTitle = `第${period.week}周素材卡片墙`;
     const description = `${period.year}第${period.week}周高考作文素材卡片墙，整理人物素材、金句、适用话题与拓展素材。`;
 
-    document.title = `${title}｜孤登塔客语文馆`;
+    document.title = "高考作文素材卡片墙｜孤登塔客语文馆";
 
     const metaDescription = document.querySelector('meta[name="description"]');
     if (metaDescription) {
