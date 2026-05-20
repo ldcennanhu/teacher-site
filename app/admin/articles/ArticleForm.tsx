@@ -143,6 +143,35 @@ function ToolbarButton({ children, onClick, title }: ToolbarButtonProps) {
   );
 }
 
+function getCurrentBlock(editor: HTMLDivElement | null) {
+  if (!editor) return null;
+
+  const selection = window.getSelection();
+  if (!selection || selection.rangeCount === 0) return null;
+
+  let node: Node | null = selection.anchorNode;
+
+  if (!node) return null;
+
+  if (node.nodeType === Node.TEXT_NODE) {
+    node = node.parentElement;
+  }
+
+  let element = node as HTMLElement | null;
+
+  while (element && element !== editor) {
+    const tagName = element.tagName?.toLowerCase();
+
+    if (["p", "div", "h1", "h2", "h3", "blockquote", "li"].includes(tagName)) {
+      return element;
+    }
+
+    element = element.parentElement;
+  }
+
+  return null;
+}
+
 export default function ArticleForm({
   action,
   article,
@@ -190,6 +219,32 @@ export default function ArticleForm({
   function clearFormat() {
     focusEditor();
     document.execCommand("removeFormat", false);
+    syncEditorContent();
+  }
+
+  function applyFirstLineIndent() {
+    focusEditor();
+
+    const block = getCurrentBlock(editorRef.current);
+
+    if (block) {
+      block.style.textIndent = "2em";
+      block.style.marginLeft = "";
+    }
+
+    syncEditorContent();
+  }
+
+  function removeFirstLineIndent() {
+    focusEditor();
+
+    const block = getCurrentBlock(editorRef.current);
+
+    if (block) {
+      block.style.textIndent = "0";
+      block.style.marginLeft = "";
+    }
+
     syncEditorContent();
   }
 
@@ -249,7 +304,7 @@ export default function ArticleForm({
       <div className="admin-card" style={{ padding: 18 }}>
         <h2 style={{ marginTop: 0 }}>正文 content</h2>
         <p className="muted">
-          支持常用富文本编辑。可直接粘贴文字，再用工具栏设置标题、加粗、列表、居中和缩进。
+          支持常用富文本编辑。首行缩进按钮只缩进当前段落第一行，不会把整段整体右移。
         </p>
 
         <div
@@ -290,11 +345,11 @@ export default function ArticleForm({
           <ToolbarButton title="右对齐" onClick={() => exec("justifyRight")}>
             右对齐
           </ToolbarButton>
-          <ToolbarButton title="增加缩进" onClick={() => exec("indent")}>
-            增加缩进
+          <ToolbarButton title="当前段落首行缩进" onClick={applyFirstLineIndent}>
+            首行缩进
           </ToolbarButton>
-          <ToolbarButton title="减少缩进" onClick={() => exec("outdent")}>
-            减少缩进
+          <ToolbarButton title="取消当前段落首行缩进" onClick={removeFirstLineIndent}>
+            取消缩进
           </ToolbarButton>
           <ToolbarButton title="清除格式" onClick={clearFormat}>
             清除格式
@@ -332,7 +387,7 @@ export default function ArticleForm({
         />
 
         <p className="muted" style={{ marginTop: 12 }}>
-          提醒：从 Word 或网页复制内容后，建议先检查标题、加粗、列表和段落是否正常；发布前请预览文章详情页。
+          提醒：需要中文首行缩进时，请把光标放在对应段落中，点击“首行缩进”；不要使用整体缩进。
         </p>
       </div>
 
