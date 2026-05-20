@@ -1736,3 +1736,52 @@ h1 {
     border: 0 !important;
   }
 }
+/* 文章正文：中文段落自动首行缩进 */
+.article-detail-content p,
+.article-content p {
+  text-indent: 2em;
+}
+
+/* 标题、列表、引用、表格等不做首行缩进 */
+.article-detail-content h1,
+.article-detail-content h2,
+.article-detail-content h3,
+.article-detail-content h4,
+.article-detail-content li,
+.article-detail-content blockquote p,
+.article-detail-content table p,
+.article-content h1,
+.article-content h2,
+.article-content h3,
+.article-content h4,
+.article-content li,
+.article-content blockquote p,
+.article-content table p {
+  text-indent: 0;
+}
+
+/* 引用块保持整体缩进，而不是首行缩进 */
+.article-detail-content blockquote,
+.article-content blockquote {
+  margin: 1.2em 0;
+  padding: 0.8em 1.2em;
+  border-left: 4px solid var(--orange);
+  background: rgba(244, 221, 210, 0.32);
+  border-radius: 10px;
+}
+
+/* 列表保持清晰缩进 */
+.article-detail-content ul,
+.article-detail-content ol,
+.article-content ul,
+.article-content ol {
+  padding-left: 1.8em;
+}
+
+/* 分隔线样式 */
+.article-detail-content hr,
+.article-content hr {
+  margin: 2em 0;
+  border: none;
+  border-top: 1px solid var(--line);
+}
