@@ -36,195 +36,102 @@ function formatDate(value: string | null) {
   }).format(new Date(value));
 }
 
-function escapeText(value: string) {
+function escapeHtml(value: string) {
   return value
     .replace(/&/g, "&amp;")
     .replace(/</g, "&lt;")
     .replace(/>/g, "&gt;");
 }
 
-function renderInlineMarkdown(text: string) {
-  const escaped = escapeText(text);
-  const parts = escaped.split(/(\*\*[^*]+\*\*)/g);
-
-  return parts.map((part, index) => {
-    if (part.startsWith("**") && part.endsWith("**")) {
-      return <strong key={index}>{part.slice(2, -2)}</strong>;
-    }
-
-    return <span key={index}>{part}</span>;
-  });
+function looksLikeHtml(value: string) {
+  return /<\/?[a-z][\s\S]*>/i.test(value);
 }
 
-function isChineseSectionHeading(text: string) {
-  const trimmed = text.trim();
+function plainTextToHtml(value: string) {
+  const blocks = value
+    .split(/\n{2,}/)
+    .map((block) => block.trim())
+    .filter(Boolean);
 
-  if (trimmed.length > 36) {
-    return false;
+  if (!blocks.length) {
+    return "<p class=\"article-empty\">暂无正文。</p>";
   }
 
-  return /^[一二三四五六七八九十]+[、.．]\s*/.test(trimmed);
+  return blocks
+    .map((block) => {
+      const escaped = escapeHtml(block).replace(/\n/g, "<br>");
+      return `<p>${escaped}</p>`;
+    })
+    .join("");
 }
 
-function renderMarkdown(content: string | null) {
-  const lines = String(content || "").split(/\r?\n/);
-  const elements: React.ReactNode[] = [];
-  let paragraphLines: string[] = [];
-  let unorderedItems: string[] = [];
-  let orderedItems: string[] = [];
+function sanitizeStyle(styleValue: string) {
+  const allowed: string[] = [];
 
-  function flushParagraph() {
-    if (!paragraphLines.length) return;
+  styleValue.split(";").forEach((part) => {
+    const [rawName, rawValue] = part.split(":");
+    const name = String(rawName || "").trim().toLowerCase();
+    const value = String(rawValue || "").trim().toLowerCase();
 
-    const text = paragraphLines.join("\n").trim();
+    if (!name || !value) return;
 
-    if (!text) {
-      paragraphLines = [];
-      return;
+    if (name === "text-align" && /^(left|center|right|justify)$/.test(value)) {
+      allowed.push(`${name}: ${value}`);
     }
 
-    if (isChineseSectionHeading(text)) {
-      elements.push(
-        <h2 key={`chinese-heading-${elements.length}`}>
-          {renderInlineMarkdown(text)}
-        </h2>
-      );
-
-      paragraphLines = [];
-      return;
+    if (name === "margin-left" && /^(\d+(\.\d+)?)(px|em|rem)$/.test(value)) {
+      allowed.push(`${name}: ${value}`);
     }
 
-    elements.push(
-      <p key={`p-${elements.length}`}>
-        <span>　　</span>
-        {text.split("\n").map((line, index) => (
-          <span key={index}>
-            {index > 0 ? <br /> : null}
-            {index > 0 ? "　　" : null}
-            {renderInlineMarkdown(line)}
-          </span>
-        ))}
-      </p>
-    );
-
-    paragraphLines = [];
-  }
-
-  function flushUnorderedList() {
-    if (!unorderedItems.length) return;
-
-    elements.push(
-      <ul key={`ul-${elements.length}`}>
-        {unorderedItems.map((item, index) => (
-          <li key={index}>{renderInlineMarkdown(item)}</li>
-        ))}
-      </ul>
-    );
-
-    unorderedItems = [];
-  }
-
-  function flushOrderedList() {
-    if (!orderedItems.length) return;
-
-    elements.push(
-      <ol key={`ol-${elements.length}`}>
-        {orderedItems.map((item, index) => (
-          <li key={index}>{renderInlineMarkdown(item)}</li>
-        ))}
-      </ol>
-    );
-
-    orderedItems = [];
-  }
-
-  function flushAll() {
-    flushParagraph();
-    flushUnorderedList();
-    flushOrderedList();
-  }
-
-  lines.forEach((line) => {
-    const trimmed = line.trim();
-
-    if (!trimmed) {
-      flushAll();
-      return;
+    if (name === "font-weight" && /^(bold|700|800|900)$/.test(value)) {
+      allowed.push(`${name}: ${value}`);
     }
 
-    if (/^---+$/.test(trimmed)) {
-      flushAll();
-      elements.push(<hr key={`hr-${elements.length}`} />);
-      return;
+    if (name === "font-style" && value === "italic") {
+      allowed.push(`${name}: ${value}`);
     }
 
-    if (trimmed.startsWith("### ")) {
-      flushAll();
-      elements.push(
-        <h3 key={`h3-${elements.length}`}>
-          {renderInlineMarkdown(trimmed.slice(4))}
-        </h3>
-      );
-      return;
+    if (name === "text-decoration" && /^(underline|line-through)$/.test(value)) {
+      allowed.push(`${name}: ${value}`);
     }
-
-    if (trimmed.startsWith("## ")) {
-      flushAll();
-      elements.push(
-        <h2 key={`h2-${elements.length}`}>
-          {renderInlineMarkdown(trimmed.slice(3))}
-        </h2>
-      );
-      return;
-    }
-
-    if (trimmed.startsWith("# ")) {
-      flushAll();
-      elements.push(
-        <h1 key={`h1-${elements.length}`}>
-          {renderInlineMarkdown(trimmed.slice(2))}
-        </h1>
-      );
-      return;
-    }
-
-    if (trimmed.startsWith("> ")) {
-      flushAll();
-      elements.push(
-        <blockquote key={`quote-${elements.length}`}>
-          <p>{renderInlineMarkdown(trimmed.slice(2))}</p>
-        </blockquote>
-      );
-      return;
-    }
-
-    const orderedMatch = trimmed.match(/^\d+\.\s+(.+)$/);
-    if (orderedMatch) {
-      flushParagraph();
-      flushUnorderedList();
-      orderedItems.push(orderedMatch[1]);
-      return;
-    }
-
-    if (trimmed.startsWith("- ")) {
-      flushParagraph();
-      flushOrderedList();
-      unorderedItems.push(trimmed.slice(2));
-      return;
-    }
-
-    flushUnorderedList();
-    flushOrderedList();
-    paragraphLines.push(trimmed);
   });
 
-  flushAll();
+  return allowed.join("; ");
+}
 
-  if (!elements.length) {
-    return <p className="article-empty">暂无正文。</p>;
+function sanitizeHtml(html: string) {
+  let cleaned = html
+    .replace(/<script[\s\S]*?>[\s\S]*?<\/script>/gi, "")
+    .replace(/<style[\s\S]*?>[\s\S]*?<\/style>/gi, "")
+    .replace(/<iframe[\s\S]*?>[\s\S]*?<\/iframe>/gi, "")
+    .replace(/<object[\s\S]*?>[\s\S]*?<\/object>/gi, "")
+    .replace(/<embed[\s\S]*?>[\s\S]*?<\/embed>/gi, "")
+    .replace(/\son\w+="[^"]*"/gi, "")
+    .replace(/\son\w+='[^']*'/gi, "")
+    .replace(/\son\w+=\S+/gi, "")
+    .replace(/javascript:/gi, "");
+
+  cleaned = cleaned.replace(/\sstyle="([^"]*)"/gi, (_match, styleValue: string) => {
+    const safeStyle = sanitizeStyle(styleValue);
+    return safeStyle ? ` style="${safeStyle}"` : "";
+  });
+
+  cleaned = cleaned.replace(/\sstyle='([^']*)'/gi, (_match, styleValue: string) => {
+    const safeStyle = sanitizeStyle(styleValue);
+    return safeStyle ? ` style="${safeStyle}"` : "";
+  });
+
+  return cleaned;
+}
+
+function articleContentHtml(content: string | null) {
+  const value = String(content || "").trim();
+
+  if (!value) {
+    return "<p class=\"article-empty\">暂无正文。</p>";
   }
 
-  return elements;
+  return sanitizeHtml(looksLikeHtml(value) ? value : plainTextToHtml(value));
 }
 
 export default async function SupabaseArticlePage({ params }: ArticlePageProps) {
@@ -298,9 +205,10 @@ export default async function SupabaseArticlePage({ params }: ArticlePageProps) 
             ) : null}
           </header>
 
-          <section className="article-detail-content">
-            {renderMarkdown(article.content)}
-          </section>
+          <section
+            className="article-detail-content rich-article-content"
+            dangerouslySetInnerHTML={{ __html: articleContentHtml(article.content) }}
+          />
 
           <footer className="article-detail-footer">
             <Link className="article-back-link" href={sectionHref}>
