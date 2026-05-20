@@ -63,6 +63,23 @@ const globalStyles = `
   .rich-article-content p {
     margin: 0 0 22px;
     text-align: justify;
+    text-indent: 2em;
+  }
+
+
+  .article-detail-content h1,
+  .article-detail-content h2,
+  .article-detail-content h3,
+  .article-detail-content li,
+  .article-detail-content blockquote p,
+  .article-detail-content table p,
+  .rich-article-content h1,
+  .rich-article-content h2,
+  .rich-article-content h3,
+  .rich-article-content li,
+  .rich-article-content blockquote p,
+  .rich-article-content table p {
+    text-indent: 0;
   }
 
   .article-detail-content h1,
