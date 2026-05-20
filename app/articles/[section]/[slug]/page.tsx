@@ -36,26 +36,154 @@ function formatDate(value: string | null) {
   }).format(new Date(value));
 }
 
-function renderParagraphs(content: string | null) {
-  const paragraphs = String(content || "")
-    .split(/\n{2,}/)
-    .map((paragraph) => paragraph.trim())
-    .filter(Boolean);
+function escapeText(value: string) {
+  return value
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;");
+}
 
-  if (!paragraphs.length) {
+function renderInlineMarkdown(text: string) {
+  const escaped = escapeText(text);
+  const parts = escaped.split(/(\*\*[^*]+\*\*)/g);
+
+  return parts.map((part, index) => {
+    if (part.startsWith("**") && part.endsWith("**")) {
+      return <strong key={index}>{part.slice(2, -2)}</strong>;
+    }
+
+    return <span key={index}>{part}</span>;
+  });
+}
+
+function renderMarkdown(content: string | null) {
+  const lines = String(content || "").split(/\r?\n/);
+  const elements: React.ReactNode[] = [];
+  let paragraphLines: string[] = [];
+  let unorderedItems: string[] = [];
+  let orderedItems: string[] = [];
+
+  function flushParagraph() {
+    if (!paragraphLines.length) return;
+
+    const text = paragraphLines.join("\n");
+    elements.push(
+      <p key={`p-${elements.length}`}>
+        {text.split("\n").map((line, index) => (
+          <span key={index}>
+            {renderInlineMarkdown(line)}
+            {index < text.split("\n").length - 1 ? <br /> : null}
+          </span>
+        ))}
+      </p>
+    );
+
+    paragraphLines = [];
+  }
+
+  function flushUnorderedList() {
+    if (!unorderedItems.length) return;
+
+    elements.push(
+      <ul key={`ul-${elements.length}`}>
+        {unorderedItems.map((item, index) => (
+          <li key={index}>{renderInlineMarkdown(item)}</li>
+        ))}
+      </ul>
+    );
+
+    unorderedItems = [];
+  }
+
+  function flushOrderedList() {
+    if (!orderedItems.length) return;
+
+    elements.push(
+      <ol key={`ol-${elements.length}`}>
+        {orderedItems.map((item, index) => (
+          <li key={index}>{renderInlineMarkdown(item)}</li>
+        ))}
+      </ol>
+    );
+
+    orderedItems = [];
+  }
+
+  function flushAll() {
+    flushParagraph();
+    flushUnorderedList();
+    flushOrderedList();
+  }
+
+  lines.forEach((line) => {
+    const trimmed = line.trim();
+
+    if (!trimmed) {
+      flushAll();
+      return;
+    }
+
+    if (/^---+$/.test(trimmed)) {
+      flushAll();
+      elements.push(<hr key={`hr-${elements.length}`} />);
+      return;
+    }
+
+    if (trimmed.startsWith("### ")) {
+      flushAll();
+      elements.push(<h3 key={`h3-${elements.length}`}>{renderInlineMarkdown(trimmed.slice(4))}</h3>);
+      return;
+    }
+
+    if (trimmed.startsWith("## ")) {
+      flushAll();
+      elements.push(<h2 key={`h2-${elements.length}`}>{renderInlineMarkdown(trimmed.slice(3))}</h2>);
+      return;
+    }
+
+    if (trimmed.startsWith("# ")) {
+      flushAll();
+      elements.push(<h1 key={`h1-${elements.length}`}>{renderInlineMarkdown(trimmed.slice(2))}</h1>);
+      return;
+    }
+
+    if (trimmed.startsWith("> ")) {
+      flushAll();
+      elements.push(
+        <blockquote key={`quote-${elements.length}`}>
+          <p>{renderInlineMarkdown(trimmed.slice(2))}</p>
+        </blockquote>
+      );
+      return;
+    }
+
+    const orderedMatch = trimmed.match(/^\d+\.\s+(.+)$/);
+    if (orderedMatch) {
+      flushParagraph();
+      flushUnorderedList();
+      orderedItems.push(orderedMatch[1]);
+      return;
+    }
+
+    if (trimmed.startsWith("- ")) {
+      flushParagraph();
+      flushOrderedList();
+      unorderedItems.push(trimmed.slice(2));
+      return;
+    }
+
+    flushUnorderedList();
+    flushOrderedList();
+    paragraphLines.push(trimmed);
+  });
+
+  flushAll();
+
+  if (!elements.length) {
     return <p className="article-empty">暂无正文。</p>;
   }
 
-  return paragraphs.map((paragraph, index) => (
-    <p key={index}>
-      {paragraph.split("\n").map((line, lineIndex) => (
-        <span key={lineIndex}>
-          {line}
-          {lineIndex < paragraph.split("\n").length - 1 ? <br /> : null}
-        </span>
-      ))}
-    </p>
-  ));
+  return elements;
 }
 
 export default async function SupabaseArticlePage({ params }: ArticlePageProps) {
@@ -130,7 +258,7 @@ export default async function SupabaseArticlePage({ params }: ArticlePageProps) 
           </header>
 
           <section className="article-detail-content">
-            {renderParagraphs(article.content)}
+            {renderMarkdown(article.content)}
           </section>
 
           <footer className="article-detail-footer">
