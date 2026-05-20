@@ -56,6 +56,16 @@ function renderInlineMarkdown(text: string) {
   });
 }
 
+function isChineseSectionHeading(text: string) {
+  const trimmed = text.trim();
+
+  if (trimmed.length > 36) {
+    return false;
+  }
+
+  return /^[一二三四五六七八九十]+[、.．]\s*/.test(trimmed);
+}
+
 function renderMarkdown(content: string | null) {
   const lines = String(content || "").split(/\r?\n/);
   const elements: React.ReactNode[] = [];
@@ -66,13 +76,32 @@ function renderMarkdown(content: string | null) {
   function flushParagraph() {
     if (!paragraphLines.length) return;
 
-    const text = paragraphLines.join("\n");
+    const text = paragraphLines.join("\n").trim();
+
+    if (!text) {
+      paragraphLines = [];
+      return;
+    }
+
+    if (isChineseSectionHeading(text)) {
+      elements.push(
+        <h2 key={`chinese-heading-${elements.length}`}>
+          {renderInlineMarkdown(text)}
+        </h2>
+      );
+
+      paragraphLines = [];
+      return;
+    }
+
     elements.push(
       <p key={`p-${elements.length}`}>
+        <span>　　</span>
         {text.split("\n").map((line, index) => (
           <span key={index}>
+            {index > 0 ? <br /> : null}
+            {index > 0 ? "　　" : null}
             {renderInlineMarkdown(line)}
-            {index < text.split("\n").length - 1 ? <br /> : null}
           </span>
         ))}
       </p>
@@ -131,19 +160,31 @@ function renderMarkdown(content: string | null) {
 
     if (trimmed.startsWith("### ")) {
       flushAll();
-      elements.push(<h3 key={`h3-${elements.length}`}>{renderInlineMarkdown(trimmed.slice(4))}</h3>);
+      elements.push(
+        <h3 key={`h3-${elements.length}`}>
+          {renderInlineMarkdown(trimmed.slice(4))}
+        </h3>
+      );
       return;
     }
 
     if (trimmed.startsWith("## ")) {
       flushAll();
-      elements.push(<h2 key={`h2-${elements.length}`}>{renderInlineMarkdown(trimmed.slice(3))}</h2>);
+      elements.push(
+        <h2 key={`h2-${elements.length}`}>
+          {renderInlineMarkdown(trimmed.slice(3))}
+        </h2>
+      );
       return;
     }
 
     if (trimmed.startsWith("# ")) {
       flushAll();
-      elements.push(<h1 key={`h1-${elements.length}`}>{renderInlineMarkdown(trimmed.slice(2))}</h1>);
+      elements.push(
+        <h1 key={`h1-${elements.length}`}>
+          {renderInlineMarkdown(trimmed.slice(2))}
+        </h1>
+      );
       return;
     }
 
