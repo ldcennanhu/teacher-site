@@ -1760,16 +1760,6 @@ h1 {
   text-indent: 0;
 }
 
-/* 引用块保持整体缩进，而不是首行缩进 */
-.article-detail-content blockquote,
-.article-content blockquote {
-  margin: 1.2em 0;
-  padding: 0.8em 1.2em;
-  border-left: 4px solid var(--orange);
-  background: rgba(244, 221, 210, 0.32);
-  border-radius: 10px;
-}
-
 /* 列表保持清晰缩进 */
 .article-detail-content ul,
 .article-detail-content ol,
