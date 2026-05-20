@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useFormState, useFormStatus } from "react-dom";
 import type { ArticleFormState } from "./actions";
 
@@ -50,12 +50,95 @@ function slugifyTitle(title: string) {
     .replace(/-{2,}/g, "-");
 }
 
+function escapeHtml(value: string) {
+  return value
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;");
+}
+
+function looksLikeHtml(value: string) {
+  return /<\/?[a-z][\s\S]*>/i.test(value);
+}
+
+function plainTextToHtml(value: string) {
+  const blocks = value
+    .split(/\n{2,}/)
+    .map((block) => block.trim())
+    .filter(Boolean);
+
+  if (!blocks.length) {
+    return "";
+  }
+
+  return blocks
+    .map((block) => {
+      const escaped = escapeHtml(block).replace(/\n/g, "<br>");
+      return `<p>${escaped}</p>`;
+    })
+    .join("");
+}
+
+function removeUnsafeHtml(html: string) {
+  return html
+    .replace(/<script[\s\S]*?>[\s\S]*?<\/script>/gi, "")
+    .replace(/<style[\s\S]*?>[\s\S]*?<\/style>/gi, "")
+    .replace(/<iframe[\s\S]*?>[\s\S]*?<\/iframe>/gi, "")
+    .replace(/<object[\s\S]*?>[\s\S]*?<\/object>/gi, "")
+    .replace(/<embed[\s\S]*?>[\s\S]*?<\/embed>/gi, "")
+    .replace(/\son\w+="[^"]*"/gi, "")
+    .replace(/\son\w+='[^']*'/gi, "")
+    .replace(/\son\w+=\S+/gi, "")
+    .replace(/javascript:/gi, "");
+}
+
+function initialEditorHtml(content?: string | null) {
+  const value = String(content || "").trim();
+
+  if (!value) {
+    return "";
+  }
+
+  return looksLikeHtml(value) ? removeUnsafeHtml(value) : plainTextToHtml(value);
+}
+
 function SubmitButton({ label }: { label: string }) {
   const { pending } = useFormStatus();
 
   return (
     <button className="admin-button" type="submit" disabled={pending}>
       {pending ? "保存中……" : label}
+    </button>
+  );
+}
+
+type ToolbarButtonProps = {
+  children: React.ReactNode;
+  onClick: () => void;
+  title?: string;
+};
+
+function ToolbarButton({ children, onClick, title }: ToolbarButtonProps) {
+  return (
+    <button
+      type="button"
+      title={title}
+      onMouseDown={(event) => {
+        event.preventDefault();
+        onClick();
+      }}
+      style={{
+        minHeight: 34,
+        padding: "0 12px",
+        border: "1px solid #d9c7b5",
+        borderRadius: 999,
+        background: "#fffaf2",
+        color: "#74432f",
+        fontWeight: 700,
+        cursor: "pointer"
+      }}
+    >
+      {children}
     </button>
   );
 }
@@ -70,6 +153,8 @@ export default function ArticleForm({
   const [title, setTitle] = useState(article?.title ?? "");
   const [slug, setSlug] = useState(article?.slug ?? "");
   const [isSlugManuallyEdited, setIsSlugManuallyEdited] = useState(Boolean(article?.slug));
+  const editorRef = useRef<HTMLDivElement | null>(null);
+  const [contentHtml, setContentHtml] = useState(() => initialEditorHtml(article?.content));
 
   const tagText = useMemo(() => {
     return (article?.tags ?? []).join(", ");
@@ -80,6 +165,33 @@ export default function ArticleForm({
       setSlug(slugifyTitle(title));
     }
   }, [isSlugManuallyEdited, title]);
+
+  function syncEditorContent() {
+    const html = editorRef.current?.innerHTML ?? "";
+    setContentHtml(removeUnsafeHtml(html));
+  }
+
+  function focusEditor() {
+    editorRef.current?.focus();
+  }
+
+  function exec(command: string, value?: string) {
+    focusEditor();
+    document.execCommand(command, false, value);
+    syncEditorContent();
+  }
+
+  function applyBlock(tag: "p" | "h2" | "h3" | "blockquote") {
+    focusEditor();
+    document.execCommand("formatBlock", false, tag);
+    syncEditorContent();
+  }
+
+  function clearFormat() {
+    focusEditor();
+    document.execCommand("removeFormat", false);
+    syncEditorContent();
+  }
 
   return (
     <form action={formAction}>
@@ -134,50 +246,95 @@ export default function ArticleForm({
         <input name="tags" defaultValue={tagText} placeholder="写作, 素材, 高考" />
       </label>
 
-      <div className="admin-card" style={{ margin: "18px 0", padding: "18px" }}>
-        <h2 style={{ marginTop: 0 }}>正文支持 Markdown 简易排版</h2>
-        <p className="muted">可直接在正文中使用以下格式，前台会自动渲染成排版效果：</p>
-        <pre style={{ whiteSpace: "pre-wrap", lineHeight: 1.7 }}>
-{`# 一级标题
-## 二级标题
-### 三级标题
+      <div className="admin-card" style={{ padding: 18 }}>
+        <h2 style={{ marginTop: 0 }}>正文 content</h2>
+        <p className="muted">
+          支持常用富文本编辑。可直接粘贴文字，再用工具栏设置标题、加粗、列表、居中和缩进。
+        </p>
 
-**加粗重点**
+        <div
+          style={{
+            display: "flex",
+            flexWrap: "wrap",
+            gap: 8,
+            margin: "12px 0 14px"
+          }}
+        >
+          <ToolbarButton title="正文" onClick={() => applyBlock("p")}>
+            正文
+          </ToolbarButton>
+          <ToolbarButton title="二级标题" onClick={() => applyBlock("h2")}>
+            二级标题
+          </ToolbarButton>
+          <ToolbarButton title="三级标题" onClick={() => applyBlock("h3")}>
+            三级标题
+          </ToolbarButton>
+          <ToolbarButton title="加粗" onClick={() => exec("bold")}>
+            加粗
+          </ToolbarButton>
+          <ToolbarButton title="引用" onClick={() => applyBlock("blockquote")}>
+            引用
+          </ToolbarButton>
+          <ToolbarButton title="有序列表" onClick={() => exec("insertOrderedList")}>
+            编号
+          </ToolbarButton>
+          <ToolbarButton title="无序列表" onClick={() => exec("insertUnorderedList")}>
+            列表
+          </ToolbarButton>
+          <ToolbarButton title="左对齐" onClick={() => exec("justifyLeft")}>
+            左对齐
+          </ToolbarButton>
+          <ToolbarButton title="居中" onClick={() => exec("justifyCenter")}>
+            居中
+          </ToolbarButton>
+          <ToolbarButton title="右对齐" onClick={() => exec("justifyRight")}>
+            右对齐
+          </ToolbarButton>
+          <ToolbarButton title="增加缩进" onClick={() => exec("indent")}>
+            增加缩进
+          </ToolbarButton>
+          <ToolbarButton title="减少缩进" onClick={() => exec("outdent")}>
+            减少缩进
+          </ToolbarButton>
+          <ToolbarButton title="清除格式" onClick={clearFormat}>
+            清除格式
+          </ToolbarButton>
+        </div>
 
-> 引用或课堂提示
+        <div
+          ref={editorRef}
+          contentEditable
+          suppressContentEditableWarning
+          onInput={syncEditorContent}
+          onBlur={syncEditorContent}
+          dangerouslySetInnerHTML={{ __html: contentHtml }}
+          style={{
+            minHeight: 420,
+            maxHeight: 720,
+            overflowY: "auto",
+            padding: "18px 20px",
+            border: "1px solid #d9c7b5",
+            borderRadius: 14,
+            background: "white",
+            lineHeight: 1.9,
+            fontSize: 16,
+            outline: "none",
+            whiteSpace: "normal"
+          }}
+        />
 
-1. 有序列表
-2. 有序列表
-
-- 无序列表
-- 无序列表
-
----`}
-        </pre>
-      </div>
-
-      <label>
-        正文 content
         <textarea
           name="content"
-          rows={22}
-          defaultValue={article?.content ?? ""}
+          value={contentHtml}
+          readOnly
           required
-          placeholder={`## 一、知识导入
-
-正文内容……
-
-## 二、核心内容
-
-**重点提醒：** 这里可以写加粗内容。
-
-> 这里可以写引用、课堂提示或学生摘抄句。
-
-1. 任务一
-2. 任务二
-3. 任务三`}
+          style={{ display: "none" }}
         />
-      </label>
+
+        <p className="muted" style={{ marginTop: 12 }}>
+          提醒：从 Word 或网页复制内容后，建议先检查标题、加粗、列表和段落是否正常；发布前请预览文章详情页。
+        </p>
+      </div>
 
       <div className="admin-form-row">
         <label>
