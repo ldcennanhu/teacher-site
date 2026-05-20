@@ -47,6 +47,16 @@ function looksLikeHtml(value: string) {
   return /<\/?[a-z][\s\S]*>/i.test(value);
 }
 
+
+function decodeHtmlEntities(value: string) {
+  return value
+    .replace(/&lt;/gi, "<")
+    .replace(/&gt;/gi, ">")
+    .replace(/&quot;/gi, '"')
+    .replace(/&#39;/gi, "'")
+    .replace(/&amp;/gi, "&");
+}
+
 function plainTextToHtml(value: string) {
   const blocks = value
     .split(/\n{2,}/)
@@ -135,7 +145,10 @@ function articleContentHtml(content: string | null) {
     return "<p class=\"article-empty\">暂无正文。</p>";
   }
 
-  return sanitizeHtml(looksLikeHtml(value) ? value : plainTextToHtml(value));
+  const decoded = decodeHtmlEntities(value);
+  const htmlSource = looksLikeHtml(decoded) ? decoded : looksLikeHtml(value) ? value : plainTextToHtml(value);
+
+  return sanitizeHtml(htmlSource);
 }
 
 export default async function SupabaseArticlePage({ params }: ArticlePageProps) {

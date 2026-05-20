@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useFormState, useFormStatus } from "react-dom";
 import type { ArticleFormState } from "./actions";
 
@@ -50,35 +50,6 @@ function slugifyTitle(title: string) {
     .replace(/-{2,}/g, "-");
 }
 
-function escapeHtml(value: string) {
-  return value
-    .replace(/&/g, "&amp;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;");
-}
-
-function looksLikeHtml(value: string) {
-  return /<\/?[a-z][\s\S]*>/i.test(value);
-}
-
-function plainTextToHtml(value: string) {
-  const blocks = value
-    .split(/\n{2,}/)
-    .map((block) => block.trim())
-    .filter(Boolean);
-
-  if (!blocks.length) {
-    return "";
-  }
-
-  return blocks
-    .map((block) => {
-      const escaped = escapeHtml(block).replace(/\n/g, "<br>");
-      return `<p>${escaped}</p>`;
-    })
-    .join("");
-}
-
 function removeUnsafeHtml(html: string) {
   return html
     .replace(/<script[\s\S]*?>[\s\S]*?<\/script>/gi, "")
@@ -92,16 +63,6 @@ function removeUnsafeHtml(html: string) {
     .replace(/javascript:/gi, "");
 }
 
-function initialEditorHtml(content?: string | null) {
-  const value = String(content || "").trim();
-
-  if (!value) {
-    return "";
-  }
-
-  return looksLikeHtml(value) ? removeUnsafeHtml(value) : plainTextToHtml(value);
-}
-
 function SubmitButton({ label }: { label: string }) {
   const { pending } = useFormStatus();
 
@@ -110,66 +71,6 @@ function SubmitButton({ label }: { label: string }) {
       {pending ? "保存中……" : label}
     </button>
   );
-}
-
-type ToolbarButtonProps = {
-  children: React.ReactNode;
-  onClick: () => void;
-  title?: string;
-};
-
-function ToolbarButton({ children, onClick, title }: ToolbarButtonProps) {
-  return (
-    <button
-      type="button"
-      title={title}
-      onMouseDown={(event) => {
-        event.preventDefault();
-        onClick();
-      }}
-      style={{
-        minHeight: 34,
-        padding: "0 12px",
-        border: "1px solid #d9c7b5",
-        borderRadius: 999,
-        background: "#fffaf2",
-        color: "#74432f",
-        fontWeight: 700,
-        cursor: "pointer"
-      }}
-    >
-      {children}
-    </button>
-  );
-}
-
-function getCurrentBlock(editor: HTMLDivElement | null) {
-  if (!editor) return null;
-
-  const selection = window.getSelection();
-  if (!selection || selection.rangeCount === 0) return null;
-
-  let node: Node | null = selection.anchorNode;
-
-  if (!node) return null;
-
-  if (node.nodeType === Node.TEXT_NODE) {
-    node = node.parentElement;
-  }
-
-  let element = node as HTMLElement | null;
-
-  while (element && element !== editor) {
-    const tagName = element.tagName?.toLowerCase();
-
-    if (["p", "div", "h1", "h2", "h3", "blockquote", "li"].includes(tagName)) {
-      return element;
-    }
-
-    element = element.parentElement;
-  }
-
-  return null;
 }
 
 export default function ArticleForm({
@@ -182,8 +83,7 @@ export default function ArticleForm({
   const [title, setTitle] = useState(article?.title ?? "");
   const [slug, setSlug] = useState(article?.slug ?? "");
   const [isSlugManuallyEdited, setIsSlugManuallyEdited] = useState(Boolean(article?.slug));
-  const editorRef = useRef<HTMLDivElement | null>(null);
-  const [contentHtml, setContentHtml] = useState(() => initialEditorHtml(article?.content));
+  const [content, setContent] = useState(article?.content ?? "");
 
   const tagText = useMemo(() => {
     return (article?.tags ?? []).join(", ");
@@ -195,58 +95,7 @@ export default function ArticleForm({
     }
   }, [isSlugManuallyEdited, title]);
 
-  function syncEditorContent() {
-    const html = editorRef.current?.innerHTML ?? "";
-    setContentHtml(removeUnsafeHtml(html));
-  }
-
-  function focusEditor() {
-    editorRef.current?.focus();
-  }
-
-  function exec(command: string, value?: string) {
-    focusEditor();
-    document.execCommand(command, false, value);
-    syncEditorContent();
-  }
-
-  function applyBlock(tag: "p" | "h2" | "h3" | "blockquote") {
-    focusEditor();
-    document.execCommand("formatBlock", false, tag);
-    syncEditorContent();
-  }
-
-  function clearFormat() {
-    focusEditor();
-    document.execCommand("removeFormat", false);
-    syncEditorContent();
-  }
-
-  function applyFirstLineIndent() {
-    focusEditor();
-
-    const block = getCurrentBlock(editorRef.current);
-
-    if (block) {
-      block.style.textIndent = "2em";
-      block.style.marginLeft = "";
-    }
-
-    syncEditorContent();
-  }
-
-  function removeFirstLineIndent() {
-    focusEditor();
-
-    const block = getCurrentBlock(editorRef.current);
-
-    if (block) {
-      block.style.textIndent = "0";
-      block.style.marginLeft = "";
-    }
-
-    syncEditorContent();
-  }
+  const previewHtml = useMemo(() => removeUnsafeHtml(content), [content]);
 
   return (
     <form action={formAction}>
@@ -302,93 +151,40 @@ export default function ArticleForm({
       </label>
 
       <div className="admin-card" style={{ padding: 18 }}>
-        <h2 style={{ marginTop: 0 }}>正文 content</h2>
-        <p className="muted">
-          支持常用富文本编辑。首行缩进按钮只缩进当前段落第一行，不会把整段整体右移。
-        </p>
-
-        <div
-          style={{
-            display: "flex",
-            flexWrap: "wrap",
-            gap: 8,
-            margin: "12px 0 14px"
-          }}
-        >
-          <ToolbarButton title="正文" onClick={() => applyBlock("p")}>
-            正文
-          </ToolbarButton>
-          <ToolbarButton title="二级标题" onClick={() => applyBlock("h2")}>
-            二级标题
-          </ToolbarButton>
-          <ToolbarButton title="三级标题" onClick={() => applyBlock("h3")}>
-            三级标题
-          </ToolbarButton>
-          <ToolbarButton title="加粗" onClick={() => exec("bold")}>
-            加粗
-          </ToolbarButton>
-          <ToolbarButton title="引用" onClick={() => applyBlock("blockquote")}>
-            引用
-          </ToolbarButton>
-          <ToolbarButton title="有序列表" onClick={() => exec("insertOrderedList")}>
-            编号
-          </ToolbarButton>
-          <ToolbarButton title="无序列表" onClick={() => exec("insertUnorderedList")}>
-            列表
-          </ToolbarButton>
-          <ToolbarButton title="左对齐" onClick={() => exec("justifyLeft")}>
-            左对齐
-          </ToolbarButton>
-          <ToolbarButton title="居中" onClick={() => exec("justifyCenter")}>
-            居中
-          </ToolbarButton>
-          <ToolbarButton title="右对齐" onClick={() => exec("justifyRight")}>
-            右对齐
-          </ToolbarButton>
-          <ToolbarButton title="当前段落首行缩进" onClick={applyFirstLineIndent}>
-            首行缩进
-          </ToolbarButton>
-          <ToolbarButton title="取消当前段落首行缩进" onClick={removeFirstLineIndent}>
-            取消缩进
-          </ToolbarButton>
-          <ToolbarButton title="清除格式" onClick={clearFormat}>
-            清除格式
-          </ToolbarButton>
-        </div>
-
-        <div
-          ref={editorRef}
-          contentEditable
-          suppressContentEditableWarning
-          onInput={syncEditorContent}
-          onBlur={syncEditorContent}
-          dangerouslySetInnerHTML={{ __html: contentHtml }}
-          style={{
-            minHeight: 420,
-            maxHeight: 720,
-            overflowY: "auto",
-            padding: "18px 20px",
-            border: "1px solid #d9c7b5",
-            borderRadius: 14,
-            background: "white",
-            lineHeight: 1.9,
-            fontSize: 16,
-            outline: "none",
-            whiteSpace: "normal"
-          }}
-        />
+        <h2 style={{ marginTop: 0 }}>正文 content（HTML 源码）</h2>
+        <p className="muted">HTML 写法提示：</p>
+        <ul className="muted" style={{ marginTop: 0, marginBottom: 12 }}>
+          <li>&lt;h2&gt;二级标题&lt;/h2&gt;</li>
+          <li>&lt;h3&gt;三级标题&lt;/h3&gt;</li>
+          <li>&lt;p&gt;正文段落&lt;/p&gt;</li>
+          <li>&lt;strong&gt;加粗&lt;/strong&gt;</li>
+          <li>&lt;blockquote&gt;&lt;p&gt;引用&lt;/p&gt;&lt;/blockquote&gt;</li>
+          <li>&lt;ol&gt;&lt;li&gt;有序列表&lt;/li&gt;&lt;/ol&gt;</li>
+          <li>&lt;ul&gt;&lt;li&gt;无序列表&lt;/li&gt;&lt;/ul&gt;</li>
+        </ul>
 
         <textarea
           name="content"
-          value={contentHtml}
-          readOnly
+          rows={20}
+          value={content}
+          onChange={(event) => setContent(event.target.value)}
           required
-          style={{ display: "none" }}
+          placeholder="请粘贴或输入可发布的 HTML 源码"
+          style={{ fontFamily: "ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace" }}
         />
 
-        <p className="muted" style={{ marginTop: 12 }}>
-          提醒：需要中文首行缩进时，请把光标放在对应段落中，点击“首行缩进”；不要使用整体缩进。
-        </p>
+        <h3 style={{ marginTop: 16, marginBottom: 10 }}>预览区域</h3>
+        <div
+          className="rich-article-content"
+          style={{
+            minHeight: 180,
+            padding: "16px 18px",
+            border: "1px solid #d9c7b5",
+            borderRadius: 12,
+            background: "#fff"
+          }}
+          dangerouslySetInnerHTML={{ __html: previewHtml }}
+        />
       </div>
 
       <div className="admin-form-row">
