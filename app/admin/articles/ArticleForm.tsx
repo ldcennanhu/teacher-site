@@ -134,9 +134,49 @@ export default function ArticleForm({
         <input name="tags" defaultValue={tagText} placeholder="写作, 素材, 高考" />
       </label>
 
+      <div className="admin-card" style={{ margin: "18px 0", padding: "18px" }}>
+        <h2 style={{ marginTop: 0 }}>正文支持 Markdown 简易排版</h2>
+        <p className="muted">可直接在正文中使用以下格式，前台会自动渲染成排版效果：</p>
+        <pre style={{ whiteSpace: "pre-wrap", lineHeight: 1.7 }}>
+{`# 一级标题
+## 二级标题
+### 三级标题
+
+**加粗重点**
+
+> 引用或课堂提示
+
+1. 有序列表
+2. 有序列表
+
+- 无序列表
+- 无序列表
+
+---`}
+        </pre>
+      </div>
+
       <label>
         正文 content
-        <textarea name="content" rows={14} defaultValue={article?.content ?? ""} required />
+        <textarea
+          name="content"
+          rows={22}
+          defaultValue={article?.content ?? ""}
+          required
+          placeholder={`## 一、知识导入
+
+正文内容……
+
+## 二、核心内容
+
+**重点提醒：** 这里可以写加粗内容。
+
+> 这里可以写引用、课堂提示或学生摘抄句。
+
+1. 任务一
+2. 任务二
+3. 任务三`}
+        />
       </label>
 
       <div className="admin-form-row">
