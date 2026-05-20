@@ -79,6 +79,10 @@ function sanitizeStyle(styleValue: string) {
       allowed.push(`${name}: ${value}`);
     }
 
+    if (name === "text-indent" && /^(\d+(\.\d+)?)(px|em|rem)$/.test(value)) {
+      allowed.push(`${name}: ${value}`);
+    }
+
     if (name === "margin-left" && /^(\d+(\.\d+)?)(px|em|rem)$/.test(value)) {
       allowed.push(`${name}: ${value}`);
     }
